@@ -1,8 +1,8 @@
 @echo off
 
 :START_ANYDESK
-start "C:\ProgramData\chocolatey\lib\anydesk.portable\tools\AnyDesk.exe"
-ping 127.0.0.1 -n 4 > nul
+start anydesk
+ping 127.0.0.1 -n 10 > nul
 for /f "delims=" %%i in ('"C:\ProgramData\chocolatey\lib\anydesk.portable\tools\AnyDesk.exe" --get-id') do (
     set ID=%%i
 )
@@ -15,7 +15,7 @@ if "%ID%"=="0" (
     goto START_ANYDESK
 )
 
-echo disalardp | "C:\ProgramData\chocolatey\lib\anydesk.portable\tools\AnyDesk.exe" --set-password _full_access
+echo disalardp | anydesk --set-password _full_access
 echo AnyDesk ID is: %ID%
 echo AnyDesk Password: disalardp
 echo You can login now!
