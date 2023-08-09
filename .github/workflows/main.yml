@@ -1,4 +1,4 @@
-name: Windows 10 - Anydesk
+name: Anydesk
 
 on:
   workflow_dispatch:
