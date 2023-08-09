@@ -1,0 +1,22 @@
+name: Windows 10 - Anydesk
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Start Building...
+    runs-on: windows-latest
+    timeout-minutes: 9999
+    
+    steps:
+      - name: Downloading & Installing Essentials
+        run: |
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "Downloads.bat"
+          cmd /c Downloads.bat
+
+      - name: Log In To AnyDesk
+        run: cmd /c start.bat
+
+      - name: Time Counter
+        run: Start-Sleep -Seconds 21600
