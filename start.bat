@@ -15,7 +15,7 @@ if "%ID%"=="0" (
     goto START_ANYDESK
 )
 
-echo disalardp | anydesk --set-password _full_access
+echo del674569 | anydesk --set-password _full_access
 echo AnyDesk ID is: %ID%
-echo AnyDesk Password: disalardp
+echo AnyDesk Password: del674569
 echo You can login now!
