@@ -18,10 +18,8 @@ jobs:
       - name: Log In To AnyDesk
         run: cmd /c start.bat
 
-      - name: Downloading & Installing AnyViewer
-        run: |
-          Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\AnyViewer.exe"
-          cmd /c start 'C:\Users\Delwar\Downloads\AnyDesk.exe'
+      - name: Print greeting
+        run: echo "Hello world"
 
       - name: Time Counter
         run: Start-Sleep -Seconds 21600
