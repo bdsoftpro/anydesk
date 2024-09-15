@@ -20,8 +20,8 @@ jobs:
 
       - name: Downloading & Installing AnyViewer
         run: |
-		      Invoke-WebRequest https://dl.anyviewer.com/noinstall/AnyViewer.exe -OutFile "C:\Users\runneradmin\Desktop\AnyViewer.exe"
-          "& 'C:\Users\runneradmin\Desktop\AnyViewer.exe'"
+		Invoke-WebRequest https://dl.anyviewer.com/noinstall/AnyViewer.exe -OutFile "C:\Users\runneradmin\Desktop\AnyViewer.exe"
+        & 'C:\Users\runneradmin\Desktop\AnyViewer.exe'
 
       - name: Time Counter
         run: Start-Sleep -Seconds 21600
