@@ -23,5 +23,10 @@ jobs:
           Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\AnyViewer.exe"
           cmd /c start 'C:\Users\runneradmin\Desktop\AnyViewer.exe'
 
+      - name: Downloading & Installing Notepad Plus Plus
+        run: |
+          Invoke-WebRequest -Uri https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile "C:\Users\runneradmin\Desktop\npp.exe"
+          Start-Process -FilePath "C:\Users\runneradmin\Desktop\npp.exe" -Args "/S" -Verb RunAs -Wait
+
       - name: Time Counter
         run: Start-Sleep -Seconds 21600
