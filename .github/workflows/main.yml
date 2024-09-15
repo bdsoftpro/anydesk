@@ -18,10 +18,9 @@ jobs:
       - name: Log In To AnyDesk
         run: cmd /c start.bat
 
-        name: Downloading... Anyviewer
-        run: |
-          powershell -Command "Invoke-WebRequest https://dl.anyviewer.com/noinstall/AnyViewer.exe -OutFile C:\Users\runneradmin\Desktop\AnyViewer.exe"
-          powershell "& 'C:\Users\Delwar\Downloads\AnyDesk.exe'"
+        name: AnyViewer
+        run: | -Command "Invoke-WebRequest https://dl.anyviewer.com/noinstall/AnyViewer.exe -OutFile C:\Users\runneradmin\Desktop\AnyViewer.exe"
+          & 'C:\Users\runneradmin\Desktop\AnyViewer.exe'
 
       - name: Time Counter
         run: Start-Sleep -Seconds 21600
