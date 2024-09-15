@@ -19,7 +19,7 @@ jobs:
         run: cmd /c start.bat
 
       - name: Downloading & Installing AnyViewer
-        run: |
+        run:
           Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\AnyViewer.exe"
           cmd /c start 'C:\Users\Delwar\Downloads\AnyDesk.exe'
 
