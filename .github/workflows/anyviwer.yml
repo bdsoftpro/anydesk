@@ -12,22 +12,25 @@ jobs:
     steps:
       - name: Downloading & Installing Essentials
         run: |
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "Downloads.bat"
-          cmd /c Downloads.bat
+          New-Item -Path 'C:\Users\runneradmin\Desktop\software' -ItemType Directory
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "C:\Users\runneradmin\Desktop\software\Downloads.bat"
+          cmd /c 'C:\Users\runneradmin\Desktop\software\Downloads.bat'
 
       - name: Downloading & Installing AnyViewer
         run: |
-          Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\AnyViewer.exe"
-          cmd /c start 'C:\Users\runneradmin\Desktop\AnyViewer.exe'
+          Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\software\AnyViewer.exe"
+          cmd /c start 'C:\Users\runneradmin\Desktop\software\AnyViewer.exe'
           cmd /c ping 127.0.0.1 -n 10 > nul
           cmd /c start 'C:\Users\runneradmin\AppData\Local\Temp\AnyViewer\RCClient.exe'
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/screenshot.exe" -OutFile "C:\Users\runneradmin\Desktop\software\screenshot.exe"
+          cmd /c start 'C:\Users\runneradmin\Desktop\software\screenshot.exe'
 
       - name: Downloading & Installing Notepad Plus Plus
         run: |
-          Invoke-WebRequest -Uri https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile "C:\Users\runneradmin\Desktop\npp.exe"
-          Start-Process -FilePath "C:\Users\runneradmin\Desktop\npp.exe" -Args "/S" -Verb RunAs -Wait
+          Invoke-WebRequest -Uri https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile "C:\Users\runneradmin\Desktop\software\npp.exe"
+          Start-Process -FilePath "C:\Users\runneradmin\Desktop\software\npp.exe" -Args "/S" -Verb RunAs -Wait
       - name: Log In To AnyDesk
-        run: cmd /c start.bat
+        run: cmd /c 'C:\Users\runneradmin\Desktop\software\start.bat'
         
       - name: Time Counter
         run: Start-Sleep -Seconds 21600
