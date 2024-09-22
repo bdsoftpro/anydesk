@@ -1,4 +1,4 @@
-name: Anydesk
+name: AnyViewer
 
 on:
   workflow_dispatch:
