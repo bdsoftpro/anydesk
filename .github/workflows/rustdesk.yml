@@ -1,10 +1,10 @@
 name: Rustdesk
 env:
-    Root: 'C:\Users\runneradmin\Desktop\software'
-    Prog: '$env:ProgramFiles\RustDesk'
-    Pwd:	'Del674569'
+  Root: 'C:\Users\runneradmin\Desktop\software'
+  Prog: '$env:ProgramFiles\RustDesk'
+  Pwd:	'Del674569'
 on:
-    workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
   build:
