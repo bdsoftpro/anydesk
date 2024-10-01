@@ -1,7 +1,7 @@
 name: Rustdesk
 env:
-  Root: "C:\\Users\\runneradmin\\Desktop\\software"
-  Prog: "$env:ProgramFiles\\RustDesk"
+  Root: "C:\Users\runneradmin\Desktop\software"
+  Prog: "C:\Program Files\ProgramFiles\RustDesk"
   Pwd:	"Del674569"
 on:
   workflow_dispatch:
@@ -16,8 +16,8 @@ jobs:
       - name: Downloading & Installing Essentials
         run: |
           New-Item -Path ${{ env.Root }} -ItemType Directory
-          Invoke-WebRequest 'https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-x86_64.exe' -Outfile ${{ env.Root }}\\rustdesk.exe
-          Start-Process ${{ env.Root }}\\rustdesk.exe --silent-install
+          Invoke-WebRequest 'https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-x86_64.exe' -Outfile ${{ env.Root }}\rustdesk.exe
+          Start-Process ${{ env.Root }}\rustdesk.exe --silent-install
           Start-Sleep -seconds 20
           
       - name: Log In To Rustdesk
@@ -27,7 +27,7 @@ jobs:
             if ($arrService -eq $null)
             {
                 Write-Output "Installing service"
-                Start-Process ${{ env.Root }}\\rustdesk.exe --install-service
+                Start-Process ${{ env.Root }}\rustdesk.exe --install-service
                 Start-Sleep -seconds 20
             }
             
@@ -37,9 +37,9 @@ jobs:
                 Start-Sleep -seconds 5
                 $arrService.Refresh()
             }
-            ${{ env.Prog }}\\rustdesk.exe --get-id | Write-Output -OutVariable rustdesk_id
-            ${{ env.Prog }}\\rustdesk.exe --config "access-mode=full"
-            ${{ env.Prog }}\\rustdesk.exe --password ${{ env.Pwd }}
+            ${{ env.Prog }}\rustdesk.exe --get-id | Write-Output -OutVariable rustdesk_id
+            ${{ env.Prog }}\rustdesk.exe --config "access-mode=full"
+            ${{ env.Prog }}\rustdesk.exe --password ${{ env.Pwd }}
             
             Write-Output "..............................................."
             Write-Output "RustDesk ID: $rustdesk_id"
