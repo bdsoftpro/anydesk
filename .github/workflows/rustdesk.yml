@@ -1,7 +1,7 @@
 name: Rustdesk
 env:
-  Root: "C:\Users\runneradmin\Desktop\software"
-  Prog: "C:\Program Files\ProgramFiles\RustDesk"
+  Root: "C:\\Users\\runneradmin\\Desktop\\software"
+  Prog: "C:\\Program Files\\ProgramFiles\\RustDesk"
   Pwd:	"Del674569"
 on:
   workflow_dispatch:
