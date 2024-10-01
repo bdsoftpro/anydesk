@@ -1,7 +1,10 @@
 name: Rustdesk
-
+env:
+    Root: 'C:\Users\runneradmin\Desktop\software'
+    Prog: '$env:ProgramFiles\RustDesk'
+    Pwd:	'Del674569'
 on:
-  workflow_dispatch:
+    workflow_dispatch:
 
 jobs:
   build:
@@ -9,11 +12,6 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 9999
 	
-  env:
-      Root: 'C:\Users\runneradmin\Desktop\software'
-      Prog: '$env:ProgramFiles\RustDesk'
-      Pwd:	'Del674569'
-    
     steps:
       - name: Downloading & Installing Essentials
         run: |
