@@ -1,3 +1,5 @@
+#password
+pwd="Del674569"
 # Specify the path to the rustdesk.dmg file
 dmg_file="/tmp/rustdesk-1.3.1-aarch64.dmg"
 
@@ -30,7 +32,7 @@ rustdesk_id=$(./RustDesk --get-id)
 
 # Apply new password to RustDesk
 ./RustDesk --server &
-/Applications/RustDesk.app/Contents/MacOS/RustDesk --password $2 &> /dev/null
+/Applications/RustDesk.app/Contents/MacOS/RustDesk --password $pwd &> /dev/null
 
 /Applications/RustDesk.app/Contents/MacOS/RustDesk --config "configstring"
 
@@ -47,7 +49,7 @@ else
 fi
 
 # Echo the value of the password variable
-echo "Password: $2"
+echo "Password: $pwd"
 echo "..............................................."
 
 echo "Please complete install on GUI, launching RustDesk now."
