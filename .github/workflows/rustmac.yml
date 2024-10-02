@@ -14,5 +14,3 @@ jobs:
       env:
         PWD: "Del674569"
       run: source configure.sh "$PWD"
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v2
