@@ -30,7 +30,7 @@ rustdesk_id=$(./RustDesk --get-id)
 
 # Apply new password to RustDesk
 ./RustDesk --server &
-/Applications/RustDesk.app/Contents/MacOS/RustDesk --password $1 &> /dev/null
+/Applications/RustDesk.app/Contents/MacOS/RustDesk --password $2 &> /dev/null
 
 /Applications/RustDesk.app/Contents/MacOS/RustDesk --config "configstring"
 
@@ -47,7 +47,7 @@ else
 fi
 
 # Echo the value of the password variable
-echo "Password: $1"
+echo "Password: $2"
 echo "..............................................."
 
 echo "Please complete install on GUI, launching RustDesk now."
