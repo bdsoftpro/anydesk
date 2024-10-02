@@ -1,9 +1,3 @@
-# Check if the script is being run as root
-if [[ $EUID -ne 0 ]]; then
-    echo "This script must be run as root."
-    exit 1
-fi
-
 # Specify the path to the rustdesk.dmg file
 dmg_file="/tmp/rustdesk-1.3.1-aarch64.dmg"
 
