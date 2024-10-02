@@ -1,15 +1,32 @@
-#password
-pwd="Del674569"
+#!/bin/bash
+
+# Assign the value random password to the password variable
+rustdesk_pw='Del674569'
+
+# Get your config string from your Web portal and Fill Below
+rustdesk_cfg="configstring"
+
+################################### Please Do Not Edit Below This Line #########################################
+
+# Check if the script is being run as root
+if [[ $EUID -ne 0 ]]; then
+    echo "This script must be run as root."
+    exit 1
+fi
+
 # Specify the path to the rustdesk.dmg file
-dmg_file="/tmp/rustdesk-1.3.1-aarch64.dmg"
+dmg_file="/tmp/ustdesk-1.3.1-x86_64.dmg"
 
 # Specify the mount point for the DMG (temporary directory)
 mount_point="/Volumes/RustDesk"
 
 # Download the rustdesk.dmg file
 echo "Downloading RustDesk Now"
-
-curl -L https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-aarch64.dmg --output "$dmg_file"
+if [[ $(arch) == 'arm64' ]]; then
+    curl -L https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-aarch64.dmg --output "$dmg_file"
+else
+    curl -L https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-x86_64.dmg --output "$dmg_file"
+fi
 
 # Mount the DMG file to the specified mount point
 hdiutil attach "$dmg_file" -mountpoint "$mount_point" &> /dev/null
@@ -32,9 +49,9 @@ rustdesk_id=$(./RustDesk --get-id)
 
 # Apply new password to RustDesk
 ./RustDesk --server &
-/Applications/RustDesk.app/Contents/MacOS/RustDesk --password $pwd &> /dev/null
+/Applications/RustDesk.app/Contents/MacOS/RustDesk --password $rustdesk_pw &> /dev/null
 
-/Applications/RustDesk.app/Contents/MacOS/RustDesk --config "configstring"
+/Applications/RustDesk.app/Contents/MacOS/RustDesk --config $rustdesk_cfg
 
 # Kill all processes named RustDesk
 rdpid=$(pgrep RustDesk)
@@ -49,7 +66,7 @@ else
 fi
 
 # Echo the value of the password variable
-echo "Password: $pwd"
+echo "Password: $rustdesk_pw"
 echo "..............................................."
 
 echo "Please complete install on GUI, launching RustDesk now."
