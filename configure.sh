@@ -53,7 +53,7 @@ else
 fi
 
 # Echo the value of the password variable
-echo "Password: $rustdesk_pw"
+echo "Password: $1"
 echo "..............................................."
 
 echo "Please complete install on GUI, launching RustDesk now."
