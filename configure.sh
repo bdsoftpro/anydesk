@@ -4,7 +4,7 @@
 sudo mdutil -i off -a
 
 # Assign the value random password to the password variable
-rustdesk_pw='Del674569'
+rustdesk_pw=$1
 
 # Get your config string from your Web portal and Fill Below
 rustdesk_cfg="configstring"
