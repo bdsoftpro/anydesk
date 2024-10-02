@@ -12,7 +12,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setting the environment up.
       env:
-        USER_PASSWORD: "Del674569"
-      run: source configure.sh "$VNC_USER_PASSWORD" "$VNC_PASSWORD" "$NGROK_AUTH_TOKEN"
+        PWD: "Del674569"
+      run: source configure.sh "$PWD"
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v2
