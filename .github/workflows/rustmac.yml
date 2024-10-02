@@ -11,6 +11,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Installing .....
-      run: source configure.sh "Del674569"
+      run: sudo source configure.sh "Del674569"
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v2
