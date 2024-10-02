@@ -10,5 +10,7 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Installing .......
+    - name: Installing .....
       run: source configure.sh
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v2
