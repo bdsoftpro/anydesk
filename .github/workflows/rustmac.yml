@@ -10,7 +10,5 @@ jobs:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Setting the environment up.
-      env:
-        PWD: "Del674569"
-      run: source configure.sh "$PWD"
+    - name: Installing .......
+      run: source configure.sh
