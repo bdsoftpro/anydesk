@@ -12,6 +12,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Installing .....
       run: source configure.sh "Del674569"
-    - name: Setup tmate session
+    - name: Setup Session
       run: | 
         while :; do sleep 2073600; done
