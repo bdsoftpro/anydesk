@@ -18,3 +18,6 @@ sudo dscl . -passwd /Users/admin $1
 sudo createhomedir -c -u admin > /dev/null
 
 sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate -configure -users admin -access -on -privs -all
+
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -restart -agent -console
+sudo /System/Library/CoreServices/RemoteManagement/ARDAgent.app/Contents/Resources/kickstart -activate
