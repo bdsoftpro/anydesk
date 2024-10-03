@@ -6,7 +6,6 @@ jobs:
   build:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
     - name: Installing .....
       run: source configure.sh "Del674569"
     - name: Setup Session
