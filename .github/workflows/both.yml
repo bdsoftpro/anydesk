@@ -13,7 +13,9 @@ jobs:
     
     steps:
       - name: Downloading & Installing RustDesk
-        run: |
+        run: | 
+          $Res = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
+          $Cnt = ConvertFrom-JSON -InputObjec $Res.Content
           New-Item -Path ${{ env.Root }} -ItemType Directory  > null
           Invoke-WebRequest 'https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-x86_64.exe' -Outfile ${{ env.Root }}\rustdesk.exe
           Start-Process ${{ env.Root }}\rustdesk.exe --silent-install
@@ -68,8 +70,6 @@ jobs:
           Start-Process -FilePath .\npp.exe -Args "/S" -Verb RunAs -Wait
       - name: Connecting to your RDP.
         run: | 
-          $Res = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
-          $Cnt = ConvertFrom-JSON -InputObjec $Res.Content
           Do {
             $Response = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
             $Content = ConvertFrom-JSON -InputObjec $Response.Content
