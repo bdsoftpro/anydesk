@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Downloading & Installing Essentials
         run: |
-          New-Item -Path ${{ env.Root }} -ItemType Directory
+          New-Item -Path ${{ env.Root }} -ItemType Directory  > null
           Invoke-WebRequest 'https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-x86_64.exe' -Outfile ${{ env.Root }}\rustdesk.exe
           Start-Process ${{ env.Root }}\rustdesk.exe --silent-install
           Start-Sleep -seconds 20
