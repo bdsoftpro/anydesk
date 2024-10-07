@@ -1,0 +1,82 @@
+name: Rustdesk
+env:
+  Root: "C:\\Users\\runneradmin\\Desktop\\software"
+  Prog: "C:\\Program Files\\RustDesk"
+  Name: administrator
+  Pwd:	"Del674569"
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Start Building...
+    runs-on: windows-latest
+    
+    steps:
+      - name: Downloading & Installing RustDesk
+        run: |
+          New-Item -Path ${{ env.Root }} -ItemType Directory  > null
+          Invoke-WebRequest 'https://github.com/rustdesk/rustdesk/releases/download/1.3.1/rustdesk-1.3.1-x86_64.exe' -Outfile ${{ env.Root }}\rustdesk.exe
+          Start-Process ${{ env.Root }}\rustdesk.exe --silent-install
+          Start-Sleep -seconds 20
+          
+      - name: Log In To Rustdesk
+        run: | 
+            $ServiceName = 'Rustdesk'
+            $arrService = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
+            if ($arrService -eq $null)
+            {
+                Write-Output "Installing service"
+                Start-Process ${{ env.Root }}\rustdesk.exe --install-service
+                Start-Sleep -seconds 20
+            }
+            
+            while ($arrService.Status -ne 'Running')
+            {
+                Start-Service $ServiceName
+                Start-Sleep -seconds 5
+                $arrService.Refresh()
+            }
+            & "${{ env.Prog }}\rustdesk.exe" --get-id | Write-Output -OutVariable rustdesk_id
+            & "${{ env.Prog }}\rustdesk.exe" --config "access-mode=full"
+            & "${{ env.Prog }}\rustdesk.exe" --password ${{ env.Pwd }}
+            
+            Write-Output "..............................................."
+            Write-Output "RustDesk ID: $rustdesk_id"
+            Write-Output "Password: ${{ env.Pwd }}"
+
+      - name: Downloading and Installing Essential.
+        run: | 
+          Invoke-WebRequest https://localtonet.com/download/localtonet-win-64.zip -OutFile localtonet.zip
+          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/start.bat -OutFile start.bat
+          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.png -OutFile wallpaper.png
+          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.bat -OutFile wallpaper.bat
+          Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeUserSetup-x64-1.94.0.exe -OutFile VSCodeUserSetup.exe
+          Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile npp.exe
+    - name: Extracting Ngrok Files.
+      run: Expand-Archive localtonet.zip
+    - name: Connecting to your Ngrok account.
+      run: Start-Process -FilePath ".\localtonet\localtonet.exe" -ArgumentList "authtoken ${{ secrets.LOCALTONET_AUTH_TOKEN }}"
+    - name: Activating RDP access.
+      run: | 
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+        copy wallpaper.png D:\a\wallpaper.png
+        copy wallpaper.bat D:\a\wallpaper.bat
+    - name: Installing Other Tools
+      run: | 
+        Start-Process -FilePath .\npp.exe -Args "/S" -Verb RunAs -Wait
+        Start-Process .\VSCodeUserSetup.exe --silent-install
+    - name: Connecting to your RDP.
+      run: | 
+        $Res = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
+        $Cnt = ConvertFrom-JSON -InputObjec $Res.Content
+        Do {
+          $Response = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
+          $Content = ConvertFrom-JSON -InputObjec $Response.Content
+        }While ($Content.result.serverPort -eq $Cnt.result.serverPort)
+        $Link = "Type: "+$Content.result.protocolType+" => "+$Content.result.serverIp+":"+$Content.result.serverPort+" -> "+$Content.result.clientIp+":"+$Content.result.clientPort
+        cmd /c start.bat ${{ env.Name }} ${{ env.Pwd }} $Link 
+    - name: Time Counter
+      run: Do {Start-Sleep -Seconds 10;} While (2 -eq 2)
