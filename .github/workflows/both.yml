@@ -38,7 +38,7 @@ jobs:
                 Start-Sleep -seconds 5
                 $arrService.Refresh()
             }
-            & "${{ env.Prog }}\rustdesk.exe" --get-id | Write-Output -OutVariable rustdesk_id
+            & "${{ env.Prog }}\rustdesk.exe" --get-id | Write-Output -OutVariable rustdesk_id > null
             & "${{ env.Prog }}\rustdesk.exe" --config "access-mode=full"
             & "${{ env.Prog }}\rustdesk.exe" --password ${{ env.Pwd }}
             
