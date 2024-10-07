@@ -1,4 +1,4 @@
-name: Rustdesk Desktop
+name: Rustdesk - Desktop
 env:
   Root: "C:\\Users\\runneradmin\\Desktop\\software"
   Prog: "C:\\Program Files\\RustDesk"
@@ -43,38 +43,5 @@ jobs:
             Write-Output "..............................................."
             Write-Output "RustDesk ID: $rustdesk_id"
             Write-Output "Password: ${{ env.Pwd }}"
-      - name: Downloading and Installing Essential.
-        run: | 
-          Invoke-WebRequest https://localtonet.com/download/localtonet-win-64.zip -OutFile localtonet.zip
-          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/start.bat -OutFile start.bat
-          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.png -OutFile wallpaper.png
-          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.bat -OutFile wallpaper.bat
-          Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeUserSetup-x64-1.94.0.exe -OutFile VSCodeUserSetup.exe
-          Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile npp.exe
-    - name: Extracting Ngrok Files.
-      run: Expand-Archive localtonet.zip
-    - name: Connecting to your Ngrok account.
-      run: Start-Process -FilePath ".\localtonet\localtonet.exe" -ArgumentList "authtoken ${{ secrets.LOCALTONET_AUTH_TOKEN }}"
-    - name: Activating RDP access.
-      run: | 
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
-        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
-        copy wallpaper.png D:\a\wallpaper.png
-        copy wallpaper.bat D:\a\wallpaper.bat
-    - name: Installing Other Tools
-      run: | 
-        Start-Process -FilePath .\npp.exe -Args "/S" -Verb RunAs -Wait
-        Start-Process .\VSCodeUserSetup.exe --silent-install
-    - name: Connecting to your RDP.
-      run: | 
-        $Res = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
-        $Cnt = ConvertFrom-JSON -InputObjec $Res.Content
-        Do {
-          $Response = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
-          $Content = ConvertFrom-JSON -InputObjec $Response.Content
-        }While ($Content.result.serverPort -eq $Cnt.result.serverPort)
-        $Link = "Type: "+$Content.result.protocolType+" => "+$Content.result.serverIp+":"+$Content.result.serverPort+" -> "+$Content.result.clientIp+":"+$Content.result.clientPort
-        cmd /c start.bat ${{ env.Name }} ${{ env.Pwd }} $Link 
-    - name: Time Counter
-      run: Do {Start-Sleep -Seconds 10;} While (2 -eq 2)
+      - name: Time Counter
+        run: Do {Start-Sleep -Seconds 10;} While (2 -eq 2)
