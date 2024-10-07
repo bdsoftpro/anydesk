@@ -43,5 +43,13 @@ jobs:
             Write-Output "..............................................."
             Write-Output "RustDesk ID: $rustdesk_id"
             Write-Output "Password: ${{ env.Pwd }}"
+      - name: Downloading and Installing Essential.
+        run: | 
+          Invoke-WebRequest https://localtonet.com/download/localtonet-win-64.zip -OutFile localtonet.zip
+          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/start.bat -OutFile start.bat
+          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.png -OutFile wallpaper.png
+          Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.bat -OutFile wallpaper.bat
+          Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeUserSetup-x64-1.94.0.exe -OutFile VSCodeUserSetup.exe
+          Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile npp.exe
       - name: Time Counter
         run: Do {Start-Sleep -Seconds 10;} While (2 -eq 2)
