@@ -52,7 +52,7 @@ jobs:
           Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.png -OutFile wallpaper.png
           Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.bat -OutFile wallpaper.bat
           Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeSetup-x64-1.94.0.exe -OutFile VSCodeSetup.exe
-          Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile npp.exe
+          Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7/npp.8.7.Installer.x64.exe -OutFile npp.8.6.7.Installer.x64.exe
       - name: Extracting Ngrok Files.
         run: Expand-Archive localtonet.zip
       - name: Connecting to your Ngrok account.
@@ -66,8 +66,8 @@ jobs:
           copy wallpaper.bat D:\a\wallpaper.bat
       - name: Installing Other Tools
         run: | 
-          Start-Process -FilePath .\VSCodeSetup.exe -ArgumentList '/verysilent /mergetasks=!runcode' -Wait -Passthru
-          Start-Process -FilePath .\npp.exe -Args "/S" -Verb RunAs -Wait
+          Start-Process -FilePath .\VSCodeSetup.exe -ArgumentList '/verysilent /mergetasks=!runcode' -Wait -Passthru > null
+          Start-Process -FilePath .\npp.8.6.7.Installer.x64.exe -Args "/S" -Verb RunAs -Wait
       - name: Connecting to your RDP.
         run: | 
           Do {
