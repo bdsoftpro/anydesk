@@ -49,7 +49,7 @@ jobs:
           Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/start.bat -OutFile start.bat
           Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.png -OutFile wallpaper.png
           Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.bat -OutFile wallpaper.bat
-          Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeUserSetup-x64-1.94.0.exe -OutFile VSCodeUserSetup.exe
+          Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeSetup-x64-1.94.0.exe -OutFile VSCodeSetup.exe
           Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile npp.exe
       - name: Extracting Ngrok Files.
         run: Expand-Archive localtonet.zip
@@ -64,8 +64,8 @@ jobs:
           copy wallpaper.bat D:\a\wallpaper.bat
       - name: Installing Other Tools
         run: | 
+          Start-Process -FilePath .\VSCodeSetup.exe -ArgumentList '/verysilent /mergetasks=!runcode' -Wait -Passthru
           Start-Process -FilePath .\npp.exe -Args "/S" -Verb RunAs -Wait
-          Start-Process .\VSCodeUserSetup.exe --silent-install
       - name: Connecting to your RDP.
         run: | 
           $Res = Invoke-WebRequest -Uri "https://localtonet.com/api/GetTunnelsByAuthToken/${{ secrets.LOCALTONET_AUTH_TOKEN }}" -Method:Get -Headers @{"Authorization"="Bearer ${{ secrets.LOCALTONET_API_TOKEN }}"; "Accept"="application/json"} -UseBasicParsing
