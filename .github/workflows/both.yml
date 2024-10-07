@@ -51,5 +51,16 @@ jobs:
           Invoke-WebRequest https://raw.githubusercontent.com/bdsoftpro/git-rdp/master/wallpaper.bat -OutFile wallpaper.bat
           Invoke-WebRequest https://vscode.download.prss.microsoft.com/dbazure/download/stable/d78a74bcdfad14d5d3b1b782f87255d802b57511/VSCodeUserSetup-x64-1.94.0.exe -OutFile VSCodeUserSetup.exe
           Invoke-WebRequest https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile npp.exe
+      - name: Extracting Ngrok Files.
+        run: Expand-Archive localtonet.zip
+      - name: Connecting to your Ngrok account.
+        run: Start-Process -FilePath ".\localtonet\localtonet.exe" -ArgumentList "authtoken ${{ secrets.LOCALTONET_AUTH_TOKEN }}"
+      - name: Activating RDP access.
+        run: | 
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server'-name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+          copy wallpaper.png D:\a\wallpaper.png
+          copy wallpaper.bat D:\a\wallpaper.bat
       - name: Time Counter
         run: Do {Start-Sleep -Seconds 10;} While (2 -eq 2)
