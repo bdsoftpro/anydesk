@@ -1,4 +1,4 @@
-name: Rustdesk & Desktop
+name: Rustdesk - Desktop
 env:
   Root: "C:\\Users\\runneradmin\\Desktop\\software"
   Prog: "C:\\Program Files\\RustDesk"
