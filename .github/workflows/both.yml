@@ -43,7 +43,6 @@ jobs:
             Write-Output "..............................................."
             Write-Output "RustDesk ID: $rustdesk_id"
             Write-Output "Password: ${{ env.Pwd }}"
-
       - name: Downloading and Installing Essential.
         run: | 
           Invoke-WebRequest https://localtonet.com/download/localtonet-win-64.zip -OutFile localtonet.zip
