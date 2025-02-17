@@ -21,11 +21,10 @@ jobs:
         run: |
           brew install ngrok
           
-      - name: Start local TCP service
+      - name: Enable SSH and set password for user
         run: |
-          # Start an SSH server or any custom TCP service
           sudo systemsetup -setremotelogin on
-          sleep 5  # Give time for the service to start
+          sudo sh -c 'echo "$USER:del!@12sha" | chpasswd'
 
       - name: Expose TCP service with ngrok
         run: |
@@ -38,5 +37,3 @@ jobs:
           # Retrieve the public ngrok TCP URL (ngrok will expose a random port on your ngrok.io)
           ngrok_url=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
           echo "ngrok TCP URL: $ngrok_url"
-      - name: Timer Count
-        run: while true; do sleep 300; done
