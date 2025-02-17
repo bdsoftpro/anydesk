@@ -15,7 +15,7 @@ jobs:
 
       - name: Start AnyDesk Service
         run: |
-          open -a AnyDesk
+          open /Applications/AnyDesk.app
           sleep 5  # Wait for AnyDesk to start
           anydesk --get-id
 
