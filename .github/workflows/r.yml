@@ -24,7 +24,7 @@ jobs:
       - name: Enable SSH and set password for user
         run: |
           sudo systemsetup -setremotelogin on
-          sudo sh -c 'echo "$USER:del!@12sha" | chpasswd'
+          sudo dscl . -passwd /Users/$USER del!@12sha
 
       - name: Expose TCP service with ngrok
         run: |
