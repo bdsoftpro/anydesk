@@ -11,4 +11,4 @@ jobs:
     steps:
       - name: Use Variable
         run: |
-          echo "repository variable : ${{ vars.BasePath }}"
+          echo "repository variable : ${{ env.BasePath }}"
