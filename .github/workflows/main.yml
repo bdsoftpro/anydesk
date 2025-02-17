@@ -1,23 +1,25 @@
-name: Anydesk
+name: Test MacOS
 
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
   build:
-    name: Start Building...
-    runs-on: windows-latest
-    timeout-minutes: 9999
-    
+    name: Start Building....
+    runs-on: macos-latest  # Use macOS GitHub Actions runner
     steps:
-      - name: Downloading & Installing Essentials
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install AnyDesk
         run: |
-          New-Item -Path 'C:\Users\runneradmin\Desktop\software' -ItemType Directory  > null
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "C:\Users\runneradmin\Desktop\software\Downloads.bat"
-          cmd /c 'C:\Users\runneradmin\Desktop\software\Downloads.bat'
+          brew install --cask anydesk  # Install AnyDesk
+
+      - name: Start AnyDesk Service
+        run: |
+          open /Applications/AnyDesk.app
+          sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
+          sleep 5  # Wait for AnyDesk to start
+          anydesk --get-id
           
-      - name: Log In To AnyDesk
-        run: cmd /c 'C:\Users\runneradmin\Desktop\software\start.bat'
-        
-      - name: Time Counter
-        run: Start-Sleep -Seconds 21600
+      - name: Timer Count
+        run: do {sleep 300} while true
