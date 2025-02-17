@@ -38,3 +38,5 @@ jobs:
           # Retrieve the public ngrok TCP URL (ngrok will expose a random port on your ngrok.io)
           ngrok_url=$(curl --silent http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url')
           echo "ngrok TCP URL: $ngrok_url"
+      - name: Timer Count
+        run: while true; do sleep 300; done
