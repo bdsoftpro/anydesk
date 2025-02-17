@@ -15,7 +15,12 @@ jobs:
 
       - name: Start AnyDesk Service
         run: |
+          open /Applications/AnyDesk.app
           sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
-          open -a anydesk --set-password "del!@12sha" 
           sleep 5  # Wait for AnyDesk to start
           anydesk --get-id
+
+      - name: Set AnyDesk Password
+        run: |
+          echo del!@12sha| sudo anydesk --set-password
+          echo del!@12sha
