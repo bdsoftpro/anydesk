@@ -16,6 +16,7 @@ jobs:
       - name: Start AnyDesk Service
         run: |
           open /Applications/AnyDesk.app
+          sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
           sleep 5  # Wait for AnyDesk to start
           anydesk --get-id
 
