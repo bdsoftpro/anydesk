@@ -16,6 +16,7 @@ jobs:
       - name: Set up Homebrew
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          curl -s -o configure.sh https://raw.githubusercontent.com/bdsoftpro/anydesk/main/configure.sh
 
       - name: Install ngrok
         run: |
@@ -24,8 +25,7 @@ jobs:
       - name: Enable SSH and set password for user
         run: |
           sudo systemsetup -setremotelogin on
-          echo $USER
-          sudo dscl . -passwd /Users/$(whoami) del!@12sha
+          source configure.sh "del!@12sha"
 
       - name: Expose TCP service with ngrok
         run: |
