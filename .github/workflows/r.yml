@@ -1,13 +1,17 @@
-name: Test macOS
+name: Test MacOS
 
 on: [push]
 
 jobs:
-  setup-macos:
-    runs-on: self-hosted  # Must use a real macOS machine
+  setup-macos-gui:
+    runs-on: macos-latest  # Use macOS GitHub Actions runner
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
       - name: Install AnyDesk
-        run: brew install --cask anydesk
+        run: |
+          brew install --cask anydesk  # Install AnyDesk
 
       - name: Start AnyDesk Service
         run: |
