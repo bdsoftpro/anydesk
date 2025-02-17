@@ -15,7 +15,7 @@ jobs:
           New-Item -Path 'C:\Users\runneradmin\Desktop\software' -ItemType Directory
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "C:\Users\runneradmin\Desktop\software\Downloads.bat"
           cmd /c 'C:\Users\runneradmin\Desktop\software\Downloads.bat'
-          [Environment]::GetFolderPath('Desktop')
+          "[Environment]::GetFolderPath('Desktop')\Look"
 
       - name: Downloading & Installing AnyViewer
         run: |
