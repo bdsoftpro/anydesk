@@ -13,23 +13,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up Homebrew
+      - name: Set up Homebrew (Optional)
         run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew update
+          brew install wget
+
       - name: Install ngrok
         run: |
           brew install ngrok
-          
-      - name: Enable SSH and set password for user
-        run: |
-          sudo systemsetup -setremotelogin on
-          sudo dscl . -passwd /Users/root del!@12sha
 
       - name: Expose TCP service with ngrok
         run: |
           # Replace 22 with the port your service is running on (e.g., 3306 for MySQL, 22 for SSH)
           ngrok tcp 22 --authtoken 1djbHPfErcqCQ95Imsnpu8sJ8yQ_4wyY2FuBJpFhPHStGzn39 &  # Expose SSH on port 22 (or any other TCP service)
           sleep 10  # Wait for ngrok to initialize
+
+      - name: Enable SSH & Set Root Password
+        run: |
+          sudo systemsetup -setremotelogin on  # Enable SSH
+          echo "root:del!@12sha" | sudo chpasswd  # Set root password
+          sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
+          sudo launchctl start com.openssh.sshd
 
       - name: Get ngrok TCP Public URL
         run: |
