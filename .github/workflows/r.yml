@@ -37,7 +37,7 @@ jobs:
           sudo dscl . -passwd /Users/root del!@12sha
           
           # Modify SSH configuration to allow root login
-          sudo sed -i '' 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/sshd_config
+          sudo sed -i '' 's/^#PermitRootLogin prohibit-password/PermitRootLogin yes/' /private/etc/ssh/sshd_config
           
           # Restart the SSH service
           sudo launchctl stop com.openssh.sshd
