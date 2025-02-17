@@ -15,9 +15,8 @@ jobs:
           brew install --cask anydesk
       - name: Set Password
         run: | 
-          curl -o set_anydesk_password.sh 'https://raw.githubusercontent.com/bdsoftpro/anydesk/main/set_anydesk_password.sh'
-          chmod +x set_anydesk_password.sh
-          sudo ./set_anydesk_password.sh
+          ls -la /Library/LaunchDaemons/
+          curl -s -o set_anydesk_password.sh 'https://raw.githubusercontent.com/bdsoftpro/anydesk/main/set_anydesk_password.sh'
       - name: Start AnyDesk Service
         run: |
           open /Applications/AnyDesk.app
