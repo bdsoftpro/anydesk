@@ -26,7 +26,7 @@ jobs:
           # Authenticate ngrok with the provided token stored in GitHub Secrets
           echo 1djbHPfErcqCQ95Imsnpu8sJ8yQ_4wyY2FuBJpFhPHStGzn39 | ngrok authtoken
 
-      - name: Start local TCP service (Example: SSH on port 22)
+      - name: Start local TCP service
         run: |
           # Start an SSH server or any custom TCP service
           sudo systemsetup -setremotelogin on
