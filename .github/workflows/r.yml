@@ -1,11 +1,14 @@
 name: Test MacOS
 
-on: [push]
+on:
+  workflow_dispatch:
 
 jobs:
   build:
     name: Start Building....
     runs-on: macos-latest
+    timeout-minutes: 9999
+    
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -15,7 +18,6 @@ jobs:
           brew install --cask anydesk
       - name: Set Password
         run: | 
-          ls -la /Library/LaunchDaemons/
           curl -s -o set_anydesk_password.sh 'https://raw.githubusercontent.com/bdsoftpro/anydesk/main/set_anydesk_password.sh'
       - name: Start AnyDesk Service
         run: |
@@ -23,5 +25,6 @@ jobs:
           sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
           sleep 5
           anydesk --get-id
+          ls -la /Library/LaunchDaemons/
       - name: Timer Count
         run: while true; do sleep 300; done
