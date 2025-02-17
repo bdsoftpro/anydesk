@@ -19,7 +19,6 @@ jobs:
           sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
           sleep 5  # Wait for AnyDesk to start
           anydesk --get-id
-
-      - name: Set AnyDesk Password
-        run: |
-          echo del!@12sha | sudo /Applications/AnyDesk.app/Contents/MacOS/AnyDesk --set-password
+          
+      - name: Timer Count
+        run: do {sleep 300} while true
