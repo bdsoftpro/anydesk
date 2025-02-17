@@ -13,16 +13,16 @@ jobs:
       - name: Install AnyDesk
         run: |
           brew install --cask anydesk
-
+      - name: Set Password
+        run: | 
+          curl -o set_anydesk_password.sh 'https://raw.githubusercontent.com/bdsoftpro/anydesk/main/set_anydesk_password.sh'
+          chmod +x set_anydesk_password.sh
+          sudo ./set_anydesk_password.sh
       - name: Start AnyDesk Service
         run: |
           open /Applications/AnyDesk.app
           sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
           sleep 5
           anydesk --get-id
-      - name: Set Password
-        run: | 
-          anydesk --version
-          sudo anydesk --set-password "DEL!@12sha"
       - name: Timer Count
         run: while true; do sleep 300; done
