@@ -8,28 +8,31 @@ jobs:
     name: Start Building...
     runs-on: windows-latest
     timeout-minutes: 9999
+    env:
+      BasePath: "${env:USERPROFILE}\\Desktop\\Software"
     
     steps:
       - name: Downloading & Installing Essentials
         run: |
-          New-Item -Path 'C:\Users\runneradmin\Desktop\software' -ItemType Directory
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "C:\Users\runneradmin\Desktop\software\Downloads.bat"
-          cmd /c 'C:\Users\runneradmin\Desktop\software\Downloads.bat'
-          "${env:USERPROFILE}\Look"
+          if (!(Test-Path -Path $BasePath)) {
+            New-Item -ItemType Directory -Path $BasePath -Force
+          }
+          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "$BasePath\Downloads.bat"
+          cmd /c '$BasePath\Downloads.bat'
 
       - name: Downloading & Installing AnyViewer
         run: |
-          Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\software\AnyViewer.exe"
-          cmd /c start 'C:\Users\runneradmin\Desktop\software\AnyViewer.exe'
+          Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "$BasePath\AnyViewer.exe"
+          cmd /c start '$BasePath\AnyViewer.exe'
           cmd /c ping 127.0.0.1 -n 10 > nul
-          cmd /c start 'C:\Users\runneradmin\AppData\Local\Temp\AnyViewer\RCClient.exe'
+          cmd /c start '${env:USERPROFILE}\AppData\Local\Temp\AnyViewer\RCClient.exe'
 
       - name: Downloading & Installing Notepad Plus Plus
         run: |
-          Invoke-WebRequest -Uri https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile "C:\Users\runneradmin\Desktop\software\npp.exe"
-          Start-Process -FilePath "C:\Users\runneradmin\Desktop\software\npp.exe" -Args "/S" -Verb RunAs -Wait
+          Invoke-WebRequest -Uri https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile "$BasePath\npp.exe"
+          Start-Process -FilePath "$BasePath\npp.exe" -Args "/S" -Verb RunAs -Wait
       - name: Log In To AnyDesk
-        run: cmd /c 'C:\Users\runneradmin\Desktop\software\start.bat'
+        run: cmd /c 'BasePath\start.bat'
         
       - name: Time Counter
         run: Start-Sleep -Seconds 21600
