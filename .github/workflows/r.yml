@@ -22,5 +22,4 @@ jobs:
 
       - name: Set AnyDesk Password
         run: |
-          echo del!@12sha| sudo anydesk --set-password
-          echo del!@12sha
+          echo "del!@12sha" | sudo /Applications/AnyDesk.app/Contents/MacOS/AnyDesk --set-password
