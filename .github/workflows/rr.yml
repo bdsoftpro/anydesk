@@ -14,8 +14,8 @@ jobs:
     steps:
       - name: Downloading & Installing Essentials
         run: |
-          if (!(Test-Path -Path $BasePath)) {
-            New-Item -ItemType Directory -Path $BasePath -Force
+          if (!(Test-Path -Path "$BasePath")) {
+            New-Item -ItemType Directory -Path "$BasePath" -Force
           }
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "$BasePath\Downloads.bat"
           cmd /c '$BasePath\Downloads.bat'
