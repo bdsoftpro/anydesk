@@ -31,7 +31,7 @@ jobs:
       - name: Enable SSH & Set Root Password
         run: |
           sudo systemsetup -setremotelogin on  # Enable SSH
-          echo "root:del!@12sha" | sudo chpasswd  # Set root password
+          sudo dscl . -passwd /Users/root del!@12sha  # Set root password
           sudo launchctl load /System/Library/LaunchDaemons/ssh.plist
           sudo launchctl start com.openssh.sshd
 
