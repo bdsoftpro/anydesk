@@ -21,4 +21,4 @@ jobs:
           anydesk --get-id
 
       - name: Set AnyDesk Password
-        run: anydesk --set-password "del!@12sha"
+        run: sudo anydesk --set-password "del!@12sha" _full_access
