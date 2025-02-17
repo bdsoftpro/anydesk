@@ -17,6 +17,7 @@ jobs:
         run: |
           brew update
           brew install wget
+          brew install --cask anydesk  # Install AnyDesk
 
       - name: Install ngrok
         run: |
