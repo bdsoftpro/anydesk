@@ -1,14 +1,19 @@
-name: Test
+name: Test macOS
 
-on:
-  workflow_dispatch:
+on: [push]
 
 jobs:
-  build:
-    name: Start Building...
-    runs-on: windows-latest
-    timeout-minutes: 9999
+  setup-macos:
+    runs-on: self-hosted  # Must use a real macOS machine
     steps:
-      - name: Use Variable
+      - name: Install AnyDesk
+        run: brew install --cask anydesk
+
+      - name: Start AnyDesk Service
         run: |
-          echo "repository variable : ${{ env.BasePath }}"
+          open -a AnyDesk
+          sleep 5  # Wait for AnyDesk to start
+          anydesk --get-id
+
+      - name: Set AnyDesk Password
+        run: anydesk --set-password "del!@12sha"
