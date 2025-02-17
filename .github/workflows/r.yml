@@ -22,7 +22,7 @@ jobs:
           anydesk --get-id
       - name: Set Password
         run: | 
-          sudo anydesk --restart
-          sudo anydesk --set-password "del!@12sha"
+          anydesk --version
+          sudo anydesk --set-password "DEL!@12sha"
       - name: Timer Count
         run: while true; do sleep 300; done
