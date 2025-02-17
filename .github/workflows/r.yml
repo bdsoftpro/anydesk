@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   setup-macos-gui:
-    runs-on: macos-latest
+    runs-on: macos-latest  # Use macOS GitHub Actions runner
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -15,10 +15,7 @@ jobs:
 
       - name: Start AnyDesk Service
         run: |
-          /Applications/AnyDesk.app/Contents/MacOS/AnyDesk &
           sudo ln -s /Applications/AnyDesk.app/Contents/MacOS/AnyDesk /usr/local/bin/anydesk
+          open -a anydesk --set-password "del!@12sha" 
           sleep 5  # Wait for AnyDesk to start
           anydesk --get-id
-
-      - name: Set AnyDesk Password
-        run: sudo anydesk --set-password del!@12sha
