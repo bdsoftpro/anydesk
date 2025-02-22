@@ -12,6 +12,8 @@ jobs:
       - name: Download System Resource
         run: |
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
+          sudo apt install osmium-tool
+          osmium --version
 
       - name: Map Location Library File
         run: curl -sL -o data.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
