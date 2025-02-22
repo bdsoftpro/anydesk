@@ -21,7 +21,7 @@ jobs:
       # একটি কাস্টম স্ক্রিপ্ট চালান
       - name: Run custom script
         run: |
-          git clone https://github.com/bdsoftpro/HTTP-Forwarders
+          git clone https://github.com/bdsoftpro/webview-gui
       
       # রিপোজিটরির ফাইলগুলি তালিকা করুন
       - name: List files
