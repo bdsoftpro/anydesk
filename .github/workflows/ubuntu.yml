@@ -9,22 +9,16 @@ jobs:
 
     steps:
       # বর্তমান ডিরেক্টরি প্রিন্ট করুন
-      - name: Print working directory
-        run: pwd
-
-      # এনভায়রনমেন্ট ভেরিয়েবল প্রিন্ট করুন
-      - name: Print environment variables
-        run: |
-          echo "App Version: ${{ vars.FULL_NAME }}"
+      - name: Map Location Library File
+        run: curl -sL -o data.osm.pbf https://download.geofabrik.de/asia-latest.osm.pbf
 
       # একটি কাস্টম স্ক্রিপ্ট চালান
-      - name: Run custom script
+      - name: Download System Resource
         run: |
-          curl -sL -o clt -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/map-server/master/clt
-          chmod +x clt
-          ./clt
-
+          git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
       
       # রিপোজিটরির ফাইলগুলি তালিকা করুন
-      - name: List files
-        run: ls -la
+      - name: Strat Server
+        run: |
+          chmod +x clt
+          ./clt "${{ vars.NGROK }}"
