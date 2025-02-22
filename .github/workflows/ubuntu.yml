@@ -16,6 +16,7 @@ jobs:
       - name: Print environment variables
         run: |
           echo "App Version: ${{ vars.FULL_NAME }}"
+          echo "Gtihub Token: ${{ vars.GIT_TOKEN }}"
           java -version
 
       # একটি কাস্টম স্ক্রিপ্ট চালান
