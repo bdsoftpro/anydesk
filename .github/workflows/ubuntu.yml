@@ -16,14 +16,13 @@ jobs:
       - name: Print environment variables
         run: |
           echo "App Version: ${{ vars.FULL_NAME }}"
-          echo "Gtihub Token: ghp_${{ vars.GTOKEN }}"
           java -version
 
       # একটি কাস্টম স্ক্রিপ্ট চালান
       - name: Run custom script
         run: |
-          git clone https://ghp_${{ vars.GTOKEN }}@github.com/bdsoftpro/HTTP-Forwarders.git
-          curl -sL -o server.php -H "Authorization: token ghp_${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/websockets/master/server.php
+          git clone https://${{ secrets..GTOKEN }}@github.com/bdsoftpro/HTTP-Forwarders.git
+          curl -sL -o server.php -H "Authorization: token ${{ secrets..GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/websockets/master/server.php
 
       
       # রিপোজিটরির ফাইলগুলি তালিকা করুন
