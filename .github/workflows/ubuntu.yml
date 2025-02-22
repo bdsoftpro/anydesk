@@ -21,7 +21,7 @@ jobs:
       # একটি কাস্টম স্ক্রিপ্ট চালান
       - name: Run custom script
         run: |
-          git clone https://${{ vars.GIT_TOKEN }}@github.com/bdsoftpro/HTTP-Forwarders.git
+          git clone "https://${{ vars.GIT_TOKEN }}@github.com/bdsoftpro/HTTP-Forwarders.git"
           curl -sL -o server.php -H "Authorization: token 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" https://raw.githubusercontent.com/bdsoftpro/websockets/master/server.php
 
       
