@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest # সর্বশেষ Ubuntu রানার ব্যবহার করুন
+    runs-on: ubuntu-latest
 
     steps:
 
@@ -14,8 +14,7 @@ jobs:
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
 
       - name: Map Location Library File
-        run: |
-          curl -sL -o data.osm.pbf -w '%{size_download} %{speed_download} %{time_total}\n' https://download.geofabrik.de/asia-latest.osm.pbf | awk '{total_size = $1;downloaded_size = $1;speed = $2;time_total = $3;printf "\rDownloaded: %.2f%%", (downloaded_size / total_size) * 100;fflush();}'
+        run: curl -sL -o data.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
   
       - name: Strat Server
         run: |
