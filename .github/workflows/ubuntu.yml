@@ -1,1 +1,32 @@
+name: Ubuntu Server
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # সর্বশেষ Ubuntu রানার ব্যবহার করুন
+
+    steps:
+      # বর্তমান ডিরেক্টরি প্রিন্ট করুন
+      - name: Print working directory
+        run: pwd
+
+      # রিপোজিটরির ফাইলগুলি তালিকা করুন
+      - name: List files
+        run: ls -la
+
+      # এনভায়রনমেন্ট ভেরিয়েবল প্রিন্ট করুন
+      - name: Print environment variables
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Commit SHA: $GITHUB_SHA"
+          echo "Branch: $GITHUB_REF"
+          echo "Workspace: $GITHUB_WORKSPACE"
+          echo "Actor: $GITHUB_ACTOR"
+
+      # একটি কাস্টম স্ক্রিপ্ট চালান
+      - name: Run custom script
+        run: |
+          df -h --total
+          lsb_release -a
