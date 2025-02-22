@@ -18,11 +18,11 @@ jobs:
       - name: Map Location Library File
         run: |
           curl -sL -o bangladesh-latest.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
-          curl -sL -o india-latest.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
+          curl -sL -o india-latest.osm.pbf https://download.geofabrik.de/asia/india-latest.osm.pbf
           osmium merge bangladesh-latest.osm.pbf india-latest.osm.pbf -o data.osm.pbf
           rm -f *-latest.osm.pbf
   
-      - name: Strat Server
+      - name: Start Server
         run: |
           chmod +x ctl
           ./ctl "${{ vars.NGROK }}"
