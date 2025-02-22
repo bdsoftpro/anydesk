@@ -12,11 +12,15 @@ jobs:
       - name: Download System Resource
         run: |
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
-          sudo apt install osmium-tool
-          osmium --version
+          sudo apt-get update
+          sudo apt-get install osmium-tool
 
       - name: Map Location Library File
-        run: curl -sL -o data.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
+        run: |
+          curl -sL -o bangladesh-latest.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
+          curl -sL -o india-latest.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
+          osmium merge bangladesh-latest.osm.pbf india-latest.osm.pbf -o data.osm.pbf
+          rm -f *-latest.osm.pbf
   
       - name: Strat Server
         run: |
