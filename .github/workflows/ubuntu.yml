@@ -16,18 +16,11 @@ jobs:
       - name: List files
         run: ls -la
 
-      # স্টেপ লেভেলে ভেরিয়েবল ব্যবহার করুন
-      - name: Print step-level variable
-        run: echo "Your Name is ${{ vars.FULL_NAME }}"
-
       # এনভায়রনমেন্ট ভেরিয়েবল প্রিন্ট করুন
       - name: Print environment variables
         run: |
-          echo "Repository: $GITHUB_REPOSITORY"
-          echo "Commit SHA: $GITHUB_SHA"
-          echo "Branch: $GITHUB_REF"
-          echo "Workspace: $GITHUB_WORKSPACE"
-          echo "Actor: $GITHUB_ACTOR"
+          echo "App Version: ${{ vars.FULL_NAME }}"
+          which java
 
       # একটি কাস্টম স্ক্রিপ্ট চালান
       - name: Run custom script
