@@ -14,9 +14,10 @@ jobs:
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
 
       - name: Map Location Library File
-        run: curl -L --progress-bar -o data.osm.pbf https://download.geofabrik.de/asia-latest.osm.pbf
+        run: |
+          curl -sL -o data.osm.pbf -w '%{size_download} %{speed_download} %{time_total}\n' https://download.geofabrik.de/asia-latest.osm.pbf | awk '{total_size = $1;downloaded_size = $1;speed = $2;time_total = $3;printf "\rDownloaded: %.2f%%", (downloaded_size / total_size) * 100;fflush();}'
   
       - name: Strat Server
         run: |
-          chmod +x clt
-          ./clt "${{ vars.NGROK }}"
+          chmod +x ctl
+          ./ctl "${{ vars.NGROK }}"
