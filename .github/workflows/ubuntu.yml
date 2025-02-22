@@ -8,16 +8,14 @@ jobs:
     runs-on: ubuntu-latest # সর্বশেষ Ubuntu রানার ব্যবহার করুন
 
     steps:
-      # বর্তমান ডিরেক্টরি প্রিন্ট করুন
-      - name: Map Location Library File
-        run: curl -L --progress-bar -o data.osm.pbf https://download.geofabrik.de/asia-latest.osm.pbf
 
-      # একটি কাস্টম স্ক্রিপ্ট চালান
       - name: Download System Resource
         run: |
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
-      
-      # রিপোজিটরির ফাইলগুলি তালিকা করুন
+
+      - name: Map Location Library File
+        run: curl -L --progress-bar -o data.osm.pbf https://download.geofabrik.de/asia-latest.osm.pbf
+  
       - name: Strat Server
         run: |
           chmod +x clt
