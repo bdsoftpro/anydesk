@@ -16,6 +16,10 @@ jobs:
       - name: List files
         run: ls -la
 
+      # স্টেপ লেভেলে ভেরিয়েবল ব্যবহার করুন
+      - name: Print step-level variable
+        run: echo "Your Name is ${{ vars.FULL_NAME }}"
+
       # এনভায়রনমেন্ট ভেরিয়েবল প্রিন্ট করুন
       - name: Print environment variables
         run: |
