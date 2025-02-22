@@ -10,7 +10,7 @@ jobs:
     steps:
       # বর্তমান ডিরেক্টরি প্রিন্ট করুন
       - name: Map Location Library File
-        run: curl -sL -o data.osm.pbf https://download.geofabrik.de/asia-latest.osm.pbf
+        run: curl -L --progress-bar -o data.osm.pbf https://download.geofabrik.de/asia-latest.osm.pbf
 
       # একটি কাস্টম স্ক্রিপ্ট চালান
       - name: Download System Resource
