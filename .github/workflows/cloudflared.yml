@@ -18,7 +18,7 @@ jobs:
         run: |
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
           rm -rf README.md ctl .git
-          md -p info
+          mkdir -p info
           curl -sL -o data.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
 
       - name: Download CloudFlare
