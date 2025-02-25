@@ -1,0 +1,42 @@
+name: CloudFlare Worker
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Essential Tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+
+      - name: Setup Map Server
+        run: |
+          git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/map-server.git .
+          rm -rf README.md ctl .git
+          md -p info
+          curl -sL -o data.osm.pbf https://download.geofabrik.de/asia/bangladesh-latest.osm.pbf
+
+      - name: Download CloudFlare
+        run: |
+          wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+          cloudflared --version
+
+      - name: Download Credentials
+        run: |
+          curl -sL -o info/credential.pem -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/cloudflared/master/credential.pem
+          curl -sL -o origin_ca_rsa_root.pem -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/cloudflared/master/origin_ca_rsa_root.pem
+          curl -sL -o server -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/cloudflared/master/server
+          chmod +x server
+  
+      - name: Start Server
+        run: |
+          cloudflared tunnel --origincert info/credential.pem create --credentials-file info/${{ vars.TUNNEL_NAME }}.json ${{ vars.TUNNEL_NAME }}
+          cloudflared tunnel --origincert info/credential.pem route dns ${{ vars.TUNNEL_NAME }} ${{ vars.HOSTNAME }}
+          ./server --credentials-file info/${{ vars.TUNNEL_NAME }}.json run --protocol http2 ${{ vars.TUNNEL_NAME }} ${{ vars.HOSTNAME }}
