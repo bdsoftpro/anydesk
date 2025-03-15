@@ -15,6 +15,8 @@ jobs:
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
           code-server &
+          while [ ! -f /home/runner/.config/code-server/config.yaml ]
+          do sleep 2 done
           cat /home/runner/.config/code-server/config.yaml
 
       - name: Download CloudFlare
