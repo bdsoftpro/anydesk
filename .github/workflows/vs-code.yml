@@ -10,12 +10,24 @@ jobs:
     steps:
       - name: Download Code Server
         run: |
-          java --version
           mkdir -p lib ~/tools ~/Project
           curl -fL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
           PASSWORD="${{ vars.VSPASSWD }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project &
+      - name: Download Flutter Anf Android
+        run: |
+          curl -sL -o flutter_linux_3.10.6-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.10.6-stable.tar.xz
+          tar -xf ~/flutter_linux_3.10.6-stable.tar.xz -C ~/tools/
+          sudo apt-get install sdkmanager android-sdk android-sdk-helper
+          mkdir -p ~/.android/sdk
+          export ANDROID_SDK_ROOT=~/.android/sdk
+          sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0'
+          yes | sudo sdkmanager --licenses
+          cd $ANDROID_SDK_ROOT
+          sudo wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
+          sudo unzip commandlinetools-linux-6858069_latest.zip
+          cd ~/
 
       - name: Download CloudFlare
         run: |
