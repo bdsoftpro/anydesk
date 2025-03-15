@@ -13,6 +13,7 @@ jobs:
           curl -fsSL https://code-server.dev/install.sh | sh
           chmod +x code-server
           sudo mv code-server /usr/local/bin/
+          sudo code-server &
 
       - name: Download CloudFlare
         run: |
