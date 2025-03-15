@@ -11,6 +11,7 @@ jobs:
       - name: Download Code Server
         run: |
           curl -fsSL https://code-server.dev/install.sh | sh
+          ls
           chmod +x code-server
           sudo mv code-server /usr/local/bin/
           sudo code-server &
