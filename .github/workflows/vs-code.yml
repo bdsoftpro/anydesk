@@ -18,16 +18,16 @@ jobs:
       - name: Download Flutter and Android
         run: |
           curl -sL -o flutter_linux_3.10.6-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.10.6-stable.tar.xz
-          tar -xf flutter_linux_3.10.6-stable.tar.xz -C ~/tools/
-          sudo apt-get install android-sdk android-sdk-helper
-          mkdir -p ~/.android/sdk
-          export ANDROID_SDK_ROOT=~/.android/sdk
-          export ANDROID_HOME=$ANDROID_SDK_ROOT
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          sudo wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
-          unzip commandlinetools-linux-*_latest.zip -d $ANDROID_SDK_ROOT
-          sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0'
-          yes | sudo sdkmanager --licenses
+            tar -xzf flutter_linux_3.10.6-stable.tar.xz -C ~/tools/ > /dev/null 2>&1
+            sudo apt-get install android-sdk android-sdk-helper
+            mkdir -p ~/.android/sdk
+            export ANDROID_SDK_ROOT=~/.android/sdk
+            export ANDROID_HOME=$ANDROID_SDK_ROOT
+            export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+            sudo wget https://dl.google.com/android/repository/commandlinetools-linux-6858069_latest.zip
+            unzip commandlinetools-linux-*_latest.zip -d $ANDROID_SDK_ROOT
+            sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0'
+            yes | sudo sdkmanager --licenses
 
       - name: Download CloudFlare
         run: |
