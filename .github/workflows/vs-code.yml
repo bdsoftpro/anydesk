@@ -25,4 +25,4 @@ jobs:
 
       - name: Start Server
         run: |
-          cloudflared tunnel --url http://127.0.0.1:3000 run --protocol http2 --token ${{ vars.VS_TUNNEL_TOKEN }}
+          cloudflared tunnel --url http://127.0.0.1:8080 run --protocol http2 --token ${{ vars.VS_TUNNEL_TOKEN }}
