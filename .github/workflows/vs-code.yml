@@ -16,6 +16,15 @@ jobs:
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
           PASSWORD="${{ vars.VSPASSWD }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project &
 
+      - name: Download sdkmanager and SDK
+        run: |
+          # https://developer.android.com/studio#cmdline-tools
+          curl -sL -o ~/commandlinetools-linux-11076708_latest.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip ~/commandlinetools-linux-*_latest.zip -d ~/
+          ln -s ~/cmdline-tools/bin/sdkmanager /usr/local/bin/sdkmanager
+          yes | sudo sdkmanager --licenses --sdk_root=~/tools
+          sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=~/tools
+
       - name: Download CloudFlare
         run: |
           curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
