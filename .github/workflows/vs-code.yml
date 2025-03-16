@@ -20,9 +20,9 @@ jobs:
         run: |
           # https://developer.android.com/studio#cmdline-tools
           curl -sL -o ~/commandlinetools-linux-11076708_latest.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip ~/commandlinetools-linux-*_latest.zip -d ~/
+          unzip ~/commandlinetools-linux-*_latest.zip -d ~/ > /dev/null 2>&1
           ln -s ~/cmdline-tools/bin/sdkmanager /usr/local/bin/sdkmanager
-          yes | sudo sdkmanager --licenses --sdk_root=/home/runner/tools
+          yes | sudo sdkmanager --licenses --sdk_root=/home/runner/tools > /dev/null 2>&1
           sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools
 
       - name: Download CloudFlare
