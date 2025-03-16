@@ -18,12 +18,14 @@ jobs:
 
       - name: Download sdkmanager and SDK
         run: |
+          curl -sL -o ~/flutter_linux-3.10.6-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.10.6-stable.tar.xz
+          tar -xf ~/flutter_linux-*-stable.tar.xz  -C ~/tools/ > /dev/null 2>&1
           curl -sL -o ~/android-studio-2024.1.2.12-linux.tar.gz https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2024.1.2.12/android-studio-2024.1.2.12-linux.tar.gz
           tar -xf ~/android-studio-*-linux.tar.gz  -C ~/.android/ > /dev/null 2>&1
           # https://developer.android.com/studio#cmdline-tools
           curl -sL -o ~/commandlinetools-linux-11076708_latest.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
-          rm -rf ~/commandlinetools-linux-*_latest.zip ~/android-studio-2024.1.2.12-linux.tar.gz
+          rm -rf ~/commandlinetools-linux-*_latest.zip ~/android-studio-*-linux.tar.gz ~/flutter_linux-*-stable.tar.xz
           ln -s ~/tools/cmdline-tools/bin/sdkmanager /usr/local/bin/sdkmanager
           yes | sudo sdkmanager --licenses --sdk_root=/home/runner/tools > /dev/null 2>&1
           sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools > /dev/null 2>&1
