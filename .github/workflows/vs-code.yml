@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Download Code Server
         run: |
-          mkdir -p lib ~/.android ~/tools ~/Project
+          mkdir -p lib ~/tools/sdk ~/Project
           curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
@@ -20,15 +20,13 @@ jobs:
         run: |
           curl -sL -o ~/flutter_linux-3.10.6-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.10.6-stable.tar.xz
           tar -xf ~/flutter_linux-*-stable.tar.xz  -C ~/tools/ > /dev/null 2>&1
-          curl -sL -o ~/android-studio-2024.1.2.12-linux.tar.gz https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2024.1.2.12/android-studio-2024.1.2.12-linux.tar.gz
-          tar -xf ~/android-studio-*-linux.tar.gz  -C ~/.android/ > /dev/null 2>&1
           # https://developer.android.com/studio#cmdline-tools
           curl -sL -o ~/commandlinetools-linux-11076708_latest.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
-          rm -rf ~/commandlinetools-linux-*_latest.zip ~/android-studio-*-linux.tar.gz ~/flutter_linux-*-stable.tar.xz
-          ln -s ~/tools/cmdline-tools/bin/sdkmanager /usr/local/bin/sdkmanager
-          yes | sudo sdkmanager --licenses --sdk_root=/home/runner/tools > /dev/null 2>&1
-          sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools > /dev/null 2>&1
+          unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/sdk/ > /dev/null 2>&1
+          rm -rf ~/commandlinetools-linux-*_latest.zip ~/flutter_linux-*-stable.tar.xz
+          ln -s ~/tools/sdk/cmdline-tools/bin/sdkmanager /usr/local/bin/sdkmanager
+          yes | sudo sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
 
       - name: Download CloudFlare
         run: |
