@@ -10,6 +10,7 @@ jobs:
     steps:
       - name: Download Code Server
         run: |
+          sudo apt install libgtk-3-dev > /dev/null 2>&1
           mkdir -p lib ~/tools/sdk ~/Project
           curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
@@ -26,7 +27,7 @@ jobs:
           rm -rf ~/commandlinetools-linux-*_latest.zip ~/flutter_linux-*-stable.tar.xz
           ln -s ~/tools/sdk/cmdline-tools/bin/sdkmanager /usr/local/bin/sdkmanager
           yes | sudo sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
-          sdkmanager --install 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          sdkmanager --install 'platform-tools' 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.2.16' --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
 
       - name: Download CloudFlare
         run: |
