@@ -26,7 +26,8 @@ jobs:
           unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
           rm -rf ~/commandlinetools-linux-*_latest.zip ~/flutter_linux-*-stable.tar.xz
           # yes | sudo ~/tools/cmdline-tools/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
-          sudo ~/tools/cmdline-tools/bin/sdkmanager --install 'cmdline-tools;17.0' 'platform-tools' 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          # sudo ~/tools/cmdline-tools/bin/sdkmanager --install 'cmdline-tools;17.0' 'platform-tools' 'ndk;25.2.9519653' 'platforms;android-34' 'build-tools;34.0.0' --sdk_root=/home/runner/tools/sdk
+          # yes | sudo /home/runner/tools/sdk/cmdline-tools/17.0/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk
           # rm -rf ~/tools/cmdline-tools
 
       - name: Download CloudFlare
