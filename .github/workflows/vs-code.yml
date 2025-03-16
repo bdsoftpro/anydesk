@@ -10,14 +10,15 @@ jobs:
     steps:
       - name: Download Code Server
         run: |
-          mkdir -p lib ~/tools ~/Project
-          curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
-          sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
+          mkdir -p ~/.android ~/tools ~/Project
+          curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }} -xz
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
           PASSWORD="${{ vars.VSPASSWD }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project &
 
       - name: Download sdkmanager and SDK
         run: |
+          curl -sL -o ~/android-studio-2024.1.2.12-linux.tar.gz https://redirector.gvt1.com/edgedl/android/studio/ide-zips/2024.1.2.12/android-studio-2024.1.2.12-linux.tar.gz
+          tar -xf ~/android-studio-*-linux.tar.gz  -C ~/.android/ > /dev/null 2>&1
           # https://developer.android.com/studio#cmdline-tools
           curl -sL -o ~/commandlinetools-linux-11076708_latest.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
