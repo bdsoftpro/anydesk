@@ -11,7 +11,7 @@ jobs:
       - name: Download Code Server
         run: |
           sudo apt install libgtk-3-dev > /dev/null 2>&1
-          mkdir -p lib ~/tools/sdk ~/Project
+          mkdir -p lib ~/tools/sdk ~/Project/.vscode
           curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
@@ -33,6 +33,7 @@ jobs:
       - name: Download CloudFlare
         run: |
           curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/laravel-api/master/keystore.jks
+          curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/laravel-api/master/linux-setting.json
           curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
           chmod +x cloudflared
           sudo mv cloudflared /usr/local/bin/
