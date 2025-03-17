@@ -29,9 +29,10 @@ jobs:
           sudo ~/tools/cmdline-tools/bin/sdkmanager --install 'cmdline-tools;latest' 'platform-tools' 'ndk;26.1.10909125' 'platforms;android-35' 'build-tools;34.0.0' --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
           rm -rf ~/tools/cmdline-tools
           yes | sudo /home/runner/tools/sdk/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
-
+          
       - name: Download CloudFlare
         run: |
+          curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/laravel-api/master/keystore.jks
           curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
           chmod +x cloudflared
           sudo mv cloudflared /usr/local/bin/
