@@ -11,8 +11,6 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p lib ~/tools/sdk ~/Project/.vscode
-          sudo git config --global user.email ${{ secrets.EMAIL }} > /dev/null 2>&1
-          sudo git config --global user.name ${{ github.actor }} > /dev/null 2>&1
           sudo apt install libgtk-3-dev > /dev/null 2>&1
           curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
@@ -21,6 +19,8 @@ jobs:
 
       - name: Download sdkmanager and SDK
         run: |
+          sudo git config --global user.email "${{ secrets.EMAIL }}" > /dev/null 2>&1
+          sudo git config --global user.name "${{ github.actor }}" > /dev/null 2>&1
           curl -sL -o ~/flutter_linux-3.27.4-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.27.4-stable.tar.xz
           tar -xf ~/flutter_linux-*-stable.tar.xz  -C ~/tools/ > /dev/null 2>&1
           # https://developer.android.com/studio#cmdline-tools
