@@ -34,6 +34,7 @@ jobs:
           
       - name: Download CloudFlare
         run: |
+          curl -sL -o .gitconfig -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/laravel-api/master/gitconfig.txt
           curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/laravel-api/master/keystore.jks
           curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/laravel-api/master/.vscode/linux-setting.json
           curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
