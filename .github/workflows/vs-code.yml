@@ -34,7 +34,6 @@ jobs:
         run: |
           curl -sL -o ~/Project/apk.sh -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/apk.sh
           sudo curl -sL -o ~/.gitconfig -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/gitconfig.txt
-          curl -sL -o ~/Project/build.gradle.kts -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/build.gradle.kts
           curl -sL -o ~/Project/gitup -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/gitup
           curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/keystore.jks
           curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/.vscode/linux-setting.json
