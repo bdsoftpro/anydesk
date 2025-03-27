@@ -26,7 +26,7 @@ jobs:
           unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
           rm -rf ~/commandlinetools-linux-*_latest.zip ~/flutter_linux-*-stable.tar.xz
           yes | sudo ~/tools/cmdline-tools/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
-          sudo ~/tools/cmdline-tools/bin/sdkmanager --install "cmdline-tools;latest" "platform-tools" "ndk;26.3.11579264" "platforms;android-34" "build-tools;30.0.3" --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          sudo ~/tools/cmdline-tools/bin/sdkmanager --install "cmdline-tools;latest" "platform-tools" "ndk;26.3.11579264" "platforms;android-34" "build-tools;34.0.0" --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
           rm -rf ~/tools/cmdline-tools
           yes | sudo /home/runner/tools/sdk/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
           
