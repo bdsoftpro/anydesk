@@ -11,5 +11,6 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p ~/.local/lib ~/.config/code-server ~/tools/sdk ~/Project/.vscode
-          echo "$HOME/.local/bin"
+          echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bash_profile
+          source ~/.bash_profile
           cat ~/.bash_profile
