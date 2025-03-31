@@ -17,7 +17,7 @@ jobs:
           tar -xzvf code-server-4.98.2-macos-amd64.tar.gz -C ~/.local/lib  > /dev/null 2>&1
           rm -rf code-server-4.98.2-macos-amd64.tar.gz
           sudo mv ~/.local/lib/code-server-4.98.2-macos-amd64 ~/.local/lib/code-server-4.98.2
-          ln -s ~/.local/lib/code-server-4.98.2/bin/code-server ~/.local/bin/code-server
+          ln -s ~/.local/lib/code-server-4.98.2/bin/code-server /usr/local/bin/code-server
           echo -e "bind-addr: 127.0.0.1:8080\nauth: password\npassword: del674569\ncert: false" > ~/.config/code-server/config.yaml
           code-server ~/Project &
 
@@ -38,7 +38,7 @@ jobs:
         run: |
           sudo curl -sL -o ~/.gitconfig -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/gitconfig.txt
           curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/keystore.jks
-          curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/.vscode/linux-setting.json
+          curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/.vscode/macosx-settings.json
           curl -sLO https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-darwin-amd64.tgz
           tar -xzvf cloudflared-darwin-amd64.tgz  > /dev/null 2>&1
           rm -rf cloudflared-darwin-amd64.tgz
