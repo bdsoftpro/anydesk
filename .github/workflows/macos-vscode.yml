@@ -11,3 +11,5 @@ jobs:
       - name: Download Code Server
         run: |
           whoami
+          pwd
+          echo ~/
