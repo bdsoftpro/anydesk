@@ -11,4 +11,4 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p ~/.local/lib ~/.config/code-server ~/tools/sdk ~/Project/.vscode
-          ls ~/.local
+          cat ~/.zshrc
