@@ -11,34 +11,4 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p ~/.local/lib ~/.config/code-server ~/tools/sdk ~/Project/.vscode
-          curl -sLO https://github.com/coder/code-server/releases/download/v4.98.2/code-server-4.98.2-macos-amd64.tar.gz | tar -C ~/.local/lib -xz
-          tar -xzvf code-server-4.98.2-macos-amd64.tar.gz -C ~/.local/lib
-          sudo mv ~/.local/lib/code-server-4.98.2-macos-amd64 ~/.local/lib/code-server-4.98.2
-          ln -s ~/.local/lib/code-server-4.98.2/bin/code-server ~/.local/bin/code-server
-          echo -e "bind-addr: 127.0.0.1:8080\nauth: password\npassword: del674569\ncert: false" > ~/.config/code-server/config.yaml
-          code-server ~/Project &
-
-      - name: Download sdkmanager and SDK
-        run: |
-          curl -sLO https://storage.googleapis.com/flutter_infra_release/releases/stable/macos/flutter_macos_3.22.0-stable.zip
-          unzip flutter_macos_*-stable.zip -d ~/tools/ > /dev/null 2>&1
-          curl -sLO https://dl.google.com/android/repository/commandlinetools-mac-13114758_latest.zip
-          unzip ~/commandlinetools-mac-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
-          yes | sudo ~/tools/cmdline-tools/bin/sdkmanager --licenses --sdk_root=/Users/runner/tools/sdk > /dev/null 2>&1
-          sudo ~/tools/cmdline-tools/bin/sdkmanager --install "cmdline-tools;latest" "platform-tools" "ndk;26.3.11579264" "platforms;android-34" "build-tools;34.0.0" "build-tools;30.0.3" --sdk_root=/Users/runner/tools/sdk > /dev/null 2>&1
-          yes | sudo /Users/runner/tools/sdk/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=/Users/runner/tools/sdk > /dev/null 2>&1
-          rm -rf ~/tools/cmdline-tools ~/cloudflared-darwin-amd64.tgz ~/code-server-*-macos-amd64.tar.gz ~/commandlinetools-mac-*_latest.zip ~/flutter_macos_*-stable.zip
-          
-      - name: Download CloudFlare
-        run: |
-          sudo curl -sL -o ~/.gitconfig -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/gitconfig.txt
-          curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/keystore.jks
-          curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/.vscode/linux-setting.json
-          curl -sLO https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-darwin-amd64.tgz
-          tar -xzvf cloudflared-darwin-amd64.tgz
-          sudo mv cloudflared ~/.local/bin/
-          sudo chmod +x ~/.local/bin/cloudflared
-
-      - name: Start Server
-        run: |
-          cloudflared tunnel --url http://127.0.0.1:8080 run --protocol http2 --token ${{ vars.VS_TUNNEL_TOKEN }}
+          echo ~/.local/lib
