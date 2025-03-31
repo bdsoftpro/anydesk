@@ -10,7 +10,7 @@ jobs:
     steps:
       - name: Download Code Server
         run: |
-          mkdir -p /usr/local/lib ~/.config/code-server ~/tools/sdk ~/Project/.vscode
+          sudo mkdir -p /usr/local/lib ~/.config/code-server ~/tools/sdk ~/Project/.vscode
           curl -sLO https://github.com/coder/code-server/releases/download/v4.98.2/code-server-4.98.2-macos-amd64.tar.gz | tar -C /usr/local/lib -xz
           tar -xzvf code-server-4.98.2-macos-amd64.tar.gz -C /usr/local/lib
           sudo mv /usr/local/lib/code-server-4.98.2-macos-amd64 /usr/local/lib/code-server-4.98.2
