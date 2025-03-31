@@ -11,3 +11,4 @@ jobs:
       - name: Download Code Server
         run: |
           ls ~/
+          echo ~/
