@@ -13,8 +13,8 @@ jobs:
           mkdir -p ~/.local/lib ~/.local/bin ~/.config/code-server ~/tools/sdk ~/Project/.vscode
           echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
           source ~/.bashrc
-          curl -sLO https://github.com/coder/code-server/releases/download/v4.98.2/code-server-4.98.2-macos-amd64.tar.gz | tar -C ~/.local/lib -xz
-          tar -xzvf code-server-4.98.2-macos-amd64.tar.gz -C ~/.local/lib
+          curl -sLO https://github.com/coder/code-server/releases/download/v4.98.2/code-server-4.98.2-macos-amd64.tar.gz  > /dev/null 2>&1
+          tar -xzvf code-server-4.98.2-macos-amd64.tar.gz -C ~/.local/lib  > /dev/null 2>&1
           sudo mv ~/.local/lib/code-server-4.98.2-macos-amd64 ~/.local/lib/code-server-4.98.2
           ln -s ~/.local/lib/code-server-4.98.2/bin/code-server ~/.local/bin/code-server
           echo -e "bind-addr: 127.0.0.1:8080\nauth: password\npassword: del674569\ncert: false" > ~/.config/code-server/config.yaml
@@ -29,7 +29,6 @@ jobs:
           yes | sudo ~/tools/cmdline-tools/bin/sdkmanager --licenses --sdk_root=/Users/runner/tools/sdk > /dev/null 2>&1
           sudo ~/tools/cmdline-tools/bin/sdkmanager --install "cmdline-tools;latest" "platform-tools" "ndk;26.3.11579264" "platforms;android-34" "build-tools;34.0.0" "build-tools;30.0.3" --sdk_root=/Users/runner/tools/sdk > /dev/null 2>&1
           yes | sudo /Users/runner/tools/sdk/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=/Users/runner/tools/sdk > /dev/null 2>&1
-          rm -rf ~/tools/cmdline-tools ~/cloudflared-darwin-amd64.tgz ~/code-server-*-macos-amd64.tar.gz ~/commandlinetools-mac-*_latest.zip ~/flutter_macos_*-stable.zip
           
       - name: Download CloudFlare
         run: |
@@ -37,9 +36,10 @@ jobs:
           curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/keystore.jks
           curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/.vscode/linux-setting.json
           curl -sLO https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-darwin-amd64.tgz
-          tar -xzvf cloudflared-darwin-amd64.tgz
+          tar -xzvf cloudflared-darwin-amd64.tgz  > /dev/null 2>&1
           sudo mv cloudflared ~/.local/bin/
           sudo chmod +x ~/.local/bin/cloudflared
+          rm -rf ~/tools/cmdline-tools ~/cloudflared-darwin-amd64.tgz ~/code-server-*-macos-amd64.tar.gz ~/commandlinetools-mac-*_latest.zip ~/flutter_macos_*-stable.zip
 
       - name: Start Server
         run: |
