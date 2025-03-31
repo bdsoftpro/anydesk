@@ -27,7 +27,7 @@ jobs:
           unzip flutter_macos_3.22.0-stable.zip -d ~/tools/ > /dev/null 2>&1
           rm -rf flutter_macos_3.22.0-stable.zip
           curl -sLO https://dl.google.com/android/repository/commandlinetools-mac-13114758_latest.zip
-          unzip ~/commandlinetools-mac-13114758_latest.zip  -d ~/tools/ > /dev/null 2>&1
+          unzip ~/commandlinetools-mac-13114758_latest.zip  -d ~/tools/
           rm -rf commandlinetools-mac-13114758_latest.zip
           ls ~/tools/cmdline-tools
           yes | sudo ~/tools/cmdline-tools/bin/sdkmanager --licenses --sdk_root=/Users/runner/tools/sdk
