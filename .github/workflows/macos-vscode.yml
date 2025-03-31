@@ -11,4 +11,5 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p ~/.local/lib ~/.config/code-server ~/tools/sdk ~/Project/.vscode
+          echo "$HOME/.local/bin"
           cat ~/.bash_profile
