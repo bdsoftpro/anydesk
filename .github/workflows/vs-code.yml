@@ -11,7 +11,7 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p lib ~/tools/sdk ~/Project/.vscode
-		  sudo apt update > /dev/null 2>&1
+          sudo apt update > /dev/null 2>&1
           sudo apt install libgtk-3-dev > /dev/null 2>&1
           curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
