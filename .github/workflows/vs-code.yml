@@ -11,9 +11,37 @@ jobs:
       - name: Download Code Server
         run: |
           mkdir -p lib ~/tools/sdk ~/Project/.vscode
-          sudo apt update > /dev/null 2>&1
-          sudo apt install libgtk-3-dev
+		  sudo apt update > /dev/null 2>&1
+          sudo apt install libgtk-3-dev > /dev/null 2>&1
           curl -sL https://github.com/coder/code-server/releases/download/v${{ vars.VSCODE_VERSION }}/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64.tar.gz | tar -C lib -xz
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
-          PASSWORD="${{ vars.VSPASSWD }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project
+          PASSWORD="${{ vars.VSPASSWD }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project &
+
+      - name: Download sdkmanager and SDK
+        run: |
+          curl -sL -o ~/flutter_linux-3.22.0-stable.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.22.0-stable.tar.xz
+          tar -xf ~/flutter_linux-*-stable.tar.xz  -C ~/tools/ > /dev/null 2>&1
+          # https://developer.android.com/studio#cmdline-tools
+          curl -sL -o ~/commandlinetools-linux-11076708_latest.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip ~/commandlinetools-linux-*_latest.zip  -d ~/tools/ > /dev/null 2>&1
+          rm -rf ~/commandlinetools-linux-*_latest.zip ~/flutter_linux-*-stable.tar.xz
+          yes | sudo ~/tools/cmdline-tools/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          sudo ~/tools/cmdline-tools/bin/sdkmanager --install "cmdline-tools;latest" "platform-tools" "ndk;26.3.11579264" "platforms;android-34" "build-tools;34.0.0" "build-tools;30.0.3" --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          rm -rf ~/tools/cmdline-tools
+          yes | sudo /home/runner/tools/sdk/cmdline-tools/latest/bin/sdkmanager --licenses --sdk_root=/home/runner/tools/sdk > /dev/null 2>&1
+          
+      - name: Download CloudFlare
+        run: |
+          curl -sL -o ~/Project/apk.sh -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/apk.sh
+          sudo curl -sL -o ~/.gitconfig -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/gitconfig.txt
+          curl -sL -o ~/Project/gitup -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/gitup
+          curl -sL -o ~/Project/keystore.jks -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/keystore.jks
+          curl -sL -o ~/Project/.vscode/settings.json -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/.vscode/linux-setting.json
+          curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared ~/Project/apk.sh ~/Project/gitup
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Start Server
+        run: |
+          cloudflared tunnel --url http://127.0.0.1:8080 run --protocol http2 --token ${{ vars.VS_TUNNEL_TOKEN }}
