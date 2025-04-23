@@ -17,9 +17,9 @@ jobs:
           sudo mv lib/code-server-${{ vars.VSCODE_VERSION }}-linux-amd64 /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}
           ln -s /usr/local/lib/code-server-${{ vars.VSCODE_VERSION }}/bin/code-server /usr/local/bin/code-server
           PASSWORD="${{ vars.VSPASSWD }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project &
-          curl -sLO https://github.com/Dart-Code/Dart-Code/releases/download/v3.60.0/dart-code-3.60.0.vsix 
-          code-server --install-extension dart-code-3.60.0.vsix
-          rm -rf dart-code-3.60.0.vsix
+          curl -sLO https://github.com/Dart-Code/Flutter/releases/download/v3.108/flutter-3.108.0.vsix 
+          code-server --install-extension flutter-3.108.0.vsix
+          rm -rf flutter-3.108.0.vsix
           # code-server --install-extension dart-code.flutter
 
       - name: Download sdkmanager and SDK
