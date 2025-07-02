@@ -20,10 +20,6 @@ jobs:
         run: |
           Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\software\AnyViewer.exe"
           cmd /c start 'C:\Users\runneradmin\Desktop\software\AnyViewer.exe'
-          cmd /c ping 127.0.0.1 -n 10 > nul
-          cmd /c start 'C:\Users\runneradmin\AppData\Local\Temp\AnyViewer\RCClient.exe'
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/screenshot.exe" -OutFile "C:\Users\runneradmin\Desktop\software\screenshot.exe"
-          cmd /c start 'C:\Users\runneradmin\Desktop\software\screenshot.exe'
 
       - name: Downloading & Installing Notepad Plus Plus
         run: |
