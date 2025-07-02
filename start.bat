@@ -1,7 +1,7 @@
 @echo off
 
 :START_ANYDESK
-start anydesk
+start C:\ProgramData\chocolatey\lib\anydesk.portable\tools\AnyDesk.exe
 ping 127.0.0.1 -n 10 > nul
 for /f "delims=" %%i in ('"C:\ProgramData\chocolatey\lib\anydesk.portable\tools\AnyDesk.exe" --get-id') do (
     set ID=%%i
