@@ -15,7 +15,7 @@ if "%ID%"=="0" (
     goto START_ANYDESK
 )
 
-echo del674569 | anydesk --set-password _full_access
+echo del674569 | C:\ProgramData\chocolatey\lib\anydesk.portable\tools\AnyDesk.exe --set-password _full_access
 echo AnyDesk ID is: %ID%
 echo AnyDesk Password: del674569
 echo You can login now!
