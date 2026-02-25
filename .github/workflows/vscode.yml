@@ -1,0 +1,50 @@
+name: VS Code
+
+on:
+  workflow_dispatch:
+    inputs:
+      tunnel-token:
+        description: 'Tunnel Token'
+        required: true
+        type: string
+
+      vscode-version:
+        description: 'VS Code Version'
+        required: true
+        type: string
+
+      vspasswd:
+        description: 'VS Code Password'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Code Server
+        run: |
+          mkdir -p lib ~/Project/.vscode
+          sudo apt update > /dev/null 2>&1
+          sudo apt install libgtk-3-dev > /dev/null 2>&1
+          curl -sL https://github.com/coder/code-server/releases/download/v${{ github.event.inputs.vscode-version }}/code-server-${{ github.event.inputs.vscode-version }}-linux-amd64.tar.gz | tar -C lib -xz
+          sudo mv lib/code-server-${{ github.event.inputs.vscode-version }}-linux-amd64 /usr/local/lib/code-server-${{ github.event.inputs.vscode-version }}
+          ln -s /usr/local/lib/code-server-${{ github.event.inputs.vscode-version }}/bin/code-server /usr/local/bin/code-server
+          PASSWORD="${{ github.event.inputs.vspasswd }}" code-server --auth password --bind-addr 127.0.0.1:8080 ~/Project &
+          curl -sLO https://github.com/Dart-Code/Dart-Code/releases/download/v3.108/dart-code-3.108.0.vsix
+          code-server --install-extension dart-code-3.108.0.vsix
+          curl -sLO https://github.com/Dart-Code/Flutter/releases/download/v3.108/flutter-3.108.0.vsix
+          code-server --install-extension flutter-3.108.0.vsix
+          rm -rf dart-code-3.108.0.vsix flutter-3.108.0.vsix
+          # code-server --install-extension dart-code.flutter
+          
+      - name: Download CloudFlare
+        run: |
+          curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Start Server
+        run: |
+          cloudflared tunnel --url http://127.0.0.1:8080 run --protocol http2 --token ${{ github.event.inputs.tunnel-token }}
