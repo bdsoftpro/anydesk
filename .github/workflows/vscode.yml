@@ -1,4 +1,4 @@
-name: VS Code
+name: VSCode
 
 on:
   workflow_dispatch:
