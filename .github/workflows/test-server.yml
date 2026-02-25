@@ -3,10 +3,6 @@ name: Test Server
 on:
   workflow_dispatch:
     inputs:
-      flutter-version:
-        description: 'Flutter Version'
-        required: true
-        type: string
       tunnel-token:
         description: 'Tunnel Token'
         required: true
