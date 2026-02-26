@@ -7,6 +7,10 @@ on:
         description: 'Tunnel Token'
         required: true
         type: string
+      header-hostname:
+        description: 'Host Name'
+        required: true
+        type: string
 
 jobs:
   build:
@@ -34,4 +38,4 @@ jobs:
 
       - name: Start Server
         run: |
-          cloudflared tunnel --url http://127.0.0.1:8082 run --protocol http2 --token ${{ github.event.inputs.tunnel-token }}
+          cloudflared tunnel --url http://127.0.0.1:8082 --http-host-header ${{ github.event.inputs.header-hostname }} run --token ${{ github.event.inputs.tunnel-token }}
