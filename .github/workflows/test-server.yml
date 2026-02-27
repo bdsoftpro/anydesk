@@ -26,7 +26,7 @@ jobs:
           curl -sL --output-dir ~/ -O -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/websoket
           curl -sL --output-dir ~/public -O -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/public/index.html
           curl -sL --output-dir ~/public -O -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/public/style.css
-          curl -sL --output-dir ~/public -O -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/public/fchat.js
+          curl -sL --output-dir ~/public -O -H "Authorization: token ${{ vars.GTOKEN }}" https://raw.githubusercontent.com/bdsoftpro/apk/master/public/gchat.js
           chmod +x ./websoket
           ./websoket &
           
