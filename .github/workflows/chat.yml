@@ -1,0 +1,42 @@
+name: Test Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      tunnel-token:
+        description: 'Tunnel Token'
+        required: true
+        type: string
+      header-hostname:
+        description: 'Host Name'
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout config repo
+        uses: actions/checkout@v4
+        with:
+          repository: bdsoftpro/websocket
+          token: ${{ vars.GTOKEN }}
+      
+      - name: Set up server environment
+        run: |
+          sudo apt update > /dev/null 2>&1
+          sudo apt install libgtk-3-dev > /dev/null 2>&1
+          sudo rm -rf .git README.md
+          chmod +x ./websoket
+          ./websoket &
+          
+      - name: Download CloudFlare
+        run: |
+          curl -sL -o cloudflared https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/
+
+      - name: Start Server
+        run: |
+          cloudflared tunnel --url http://127.0.0.1:8080 --http-host-header ${{ github.event.inputs.header-hostname }} run --token ${{ github.event.inputs.tunnel-token }}
