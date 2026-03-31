@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout config repo
+      - name: Checkout websocket repo
         uses: actions/checkout@v4
         with:
           repository: bdsoftpro/websocket
