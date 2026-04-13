@@ -45,7 +45,7 @@ jobs:
           --enable-demuxer=mp4,mov,avi,webm \
           --extra-cflags="-Wno-array-bounds -Wno-unused-label -Wno-unused-function" \
           --disable-protocols \
-          --disable-tls
+          --disable-network
     
     - name: Build FFmpeg
       shell: msys2 {0}
@@ -76,7 +76,7 @@ jobs:
           -lcrypt32 \
           -lncrypt
     
-    - name: Verify DLL Creation
+    - name: Verify and Upload DLL
       shell: msys2 {0}
       run: |
         cd ffmpeg
