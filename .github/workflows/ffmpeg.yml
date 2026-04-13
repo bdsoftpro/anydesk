@@ -21,6 +21,7 @@ jobs:
         install: |
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-make
+          mingw-w64-ucrt-x86_64-nasm
           make
     
     - name: Configure FFmpeg
@@ -38,7 +39,8 @@ jobs:
           --enable-avutil \
           --enable-swscale \
           --enable-decoder=h264,mpeg4,vp9 \
-          --enable-demuxer=mp4,mov,avi,webm
+          --enable-demuxer=mp4,mov,avi,webm \
+          --disable-x86asm
     
     - name: Build FFmpeg
       shell: msys2 {0}
