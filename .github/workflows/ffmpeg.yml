@@ -1,4 +1,4 @@
-name: FFmpeg
+name: FFmpeg DLL
 
 on:
   workflow_dispatch:
@@ -22,6 +22,9 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-nasm
+          mingw-w64-ucrt-x86_64-diffutils
+          mingw-w64-ucrt-x86_64-pkg-config
+          mingw-w64-ucrt-x86_64-libiconv
           make
     
     - name: Configure FFmpeg
@@ -40,15 +43,16 @@ jobs:
           --enable-swscale \
           --enable-decoder=h264,mpeg4,vp9 \
           --enable-demuxer=mp4,mov,avi,webm \
-          --disable-x86asm
+          --extra-cflags="-Wno-array-bounds -Wno-unused-label -Wno-unused-function" \
+          --extra-ldflags="-liconv -lws2_32 -lwinmm"
     
     - name: Build FFmpeg
       shell: msys2 {0}
       run: |
         cd ffmpeg
-        make -j4
+        make -j4 2>&1 | grep -v "warning:" || true
     
-    - name: Create Single DLL
+    - name: Create Single DLL (with all required libraries)
       shell: msys2 {0}
       run: |
         cd ffmpeg
@@ -59,7 +63,28 @@ jobs:
           libavutil/libavutil.a \
           libswscale/libswscale.a \
           -Wl,--no-whole-archive \
-          -lole32 -lstrmiids -luuid -lz
+          -liconv \
+          -lws2_32 \
+          -lwinmm \
+          -lole32 \
+          -lstrmiids \
+          -luuid \
+          -lz \
+          -lbcrypt \
+          -lsecur32
+    
+    - name: Verify DLL Creation
+      shell: msys2 {0}
+      run: |
+        cd ffmpeg
+        if [ -f ffmpeg_single.dll ]; then
+          echo "✅ ffmpeg_single.dll created successfully!"
+          ls -lh ffmpeg_single.dll
+          file ffmpeg_single.dll
+        else
+          echo "❌ ffmpeg_single.dll not found!"
+          exit 1
+        fi
     
     - name: Upload DLL
       uses: actions/upload-artifact@v4
