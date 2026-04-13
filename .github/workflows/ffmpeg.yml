@@ -44,7 +44,8 @@ jobs:
           --enable-decoder=h264,mpeg4,vp9 \
           --enable-demuxer=mp4,mov,avi,webm \
           --extra-cflags="-Wno-array-bounds -Wno-unused-label -Wno-unused-function" \
-          --extra-ldflags="-liconv -lws2_32 -lwinmm"
+          --disable-protocols \
+          --disable-tls
     
     - name: Build FFmpeg
       shell: msys2 {0}
@@ -52,7 +53,7 @@ jobs:
         cd ffmpeg
         make -j4 2>&1 | grep -v "warning:" || true
     
-    - name: Create Single DLL (with all required libraries)
+    - name: Create Single DLL
       shell: msys2 {0}
       run: |
         cd ffmpeg
@@ -71,7 +72,9 @@ jobs:
           -luuid \
           -lz \
           -lbcrypt \
-          -lsecur32
+          -lsecur32 \
+          -lcrypt32 \
+          -lncrypt
     
     - name: Verify DLL Creation
       shell: msys2 {0}
@@ -80,7 +83,6 @@ jobs:
         if [ -f ffmpeg_single.dll ]; then
           echo "✅ ffmpeg_single.dll created successfully!"
           ls -lh ffmpeg_single.dll
-          file ffmpeg_single.dll
         else
           echo "❌ ffmpeg_single.dll not found!"
           exit 1
