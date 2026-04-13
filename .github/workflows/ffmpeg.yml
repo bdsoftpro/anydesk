@@ -1,0 +1,67 @@
+name: FFmpeg
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout FFmpeg
+      run: |
+        git clone https://git.ffmpeg.org/ffmpeg.git
+        cd ffmpeg
+    
+    - name: Setup MSYS2
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: UCRT64
+        update: true
+        install: |
+          mingw-w64-ucrt-x86_64-gcc
+          mingw-w64-ucrt-x86_64-make
+          make
+    
+    - name: Configure FFmpeg
+      shell: msys2 {0}
+      run: |
+        cd ffmpeg
+        ./configure \
+          --disable-shared \
+          --enable-static \
+          --enable-gpl \
+          --enable-version3 \
+          --disable-all \
+          --enable-avcodec \
+          --enable-avformat \
+          --enable-avutil \
+          --enable-swscale \
+          --enable-decoder=h264,mpeg4,vp9 \
+          --enable-demuxer=mp4,mov,avi,webm
+    
+    - name: Build FFmpeg
+      shell: msys2 {0}
+      run: |
+        cd ffmpeg
+        make -j4
+    
+    - name: Create Single DLL
+      shell: msys2 {0}
+      run: |
+        cd ffmpeg
+        gcc -shared -o ffmpeg_single.dll \
+          -Wl,--whole-archive \
+          libavcodec/libavcodec.a \
+          libavformat/libavformat.a \
+          libavutil/libavutil.a \
+          libswscale/libswscale.a \
+          -Wl,--no-whole-archive \
+          -lole32 -lstrmiids -luuid -lz
+    
+    - name: Upload DLL
+      uses: actions/upload-artifact@v4
+      with:
+        name: ffmpeg_single.dll
+        path: ffmpeg/ffmpeg_single.dll
+        if-no-files-found: error
