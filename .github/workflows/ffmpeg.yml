@@ -1,4 +1,4 @@
-name: FFmpeg DLL
+name: Build FFmpeg Single DLL
 
 on:
   workflow_dispatch:
@@ -22,12 +22,11 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-nasm
-          mingw-w64-ucrt-x86_64-diffutils
           mingw-w64-ucrt-x86_64-libiconv
           mingw-w64-ucrt-x86_64-zlib
           make
     
-    - name: Configure FFmpeg (All static libs)
+    - name: Configure FFmpeg
       shell: msys2 {0}
       run: |
         cd ffmpeg
@@ -35,7 +34,6 @@ jobs:
           --disable-shared \
           --enable-static \
           --enable-gpl \
-          --enable-version3 \
           --enable-avcodec \
           --enable-avformat \
           --enable-avutil \
@@ -51,27 +49,24 @@ jobs:
           --disable-everything \
           --enable-decoder=h264,mpeg4,aac,mp3 \
           --enable-demuxer=mp4,mov,avi,mkv \
-          --enable-protocol=file \
-          --extra-ldflags="-static-libgcc -static-libstdc++"
+          --enable-protocol=file
     
-    - name: Build
+    - name: Build FFmpeg
       shell: msys2 {0}
       run: |
         cd ffmpeg
         make -j4
-        
-        echo "✅ Build complete. Libraries:"
-        ls -la libavcodec/*.a | wc -l
-        ls -la libavformat/*.a | wc -l
-        ls -la libavutil/*.a | wc -l
-        ls -la libswresample/*.a | wc -l
+        echo "✅ Build complete"
+        ls -la libavcodec/*.a | head -3
+        ls -la libavformat/*.a | head -3
+        ls -la libswresample/*.a | head -3
     
-    - name: Create Single DLL with all dependencies
+    - name: Create Single DLL
       shell: msys2 {0}
       run: |
         cd ffmpeg
         
-        # Create single DLL including swresample
+        # Create single DLL
         gcc -shared -o ffmpeg_single.dll \
           -Wl,--whole-archive \
           libavcodec/libavcodec.a \
@@ -83,29 +78,27 @@ jobs:
           -static-libgcc \
           -static-libstdc++ \
           -Wl,--export-all-symbols \
-          -lwinmm \
-          -lws2_32 \
-          -lole32 \
-          -lstrmiids \
-          -luuid \
-          -lbcrypt \
-          -lsecur32 \
-          -liconv \
-          -lz
+          -lwinmm -lws2_32 -lole32 -lstrmiids -luuid -lbcrypt -lsecur32
         
-        # Strip debug symbols
-        strip ffmpeg_single.dll
+        # Strip to reduce size
+        strip --strip-all ffmpeg_single.dll
         
-        echo "✅ Single DLL created!"
-        ls -lh ffmpeg_single.dll
-        
-        # Verify exports
-        echo ""
-        echo "Exported symbols:"
-        nm -D ffmpeg_single.dll | grep " T " | head -10
+        # Check if created
+        if [ -f ffmpeg_single.dll ]; then
+          echo "✅ ffmpeg_single.dll created successfully!"
+          ls -lh ffmpeg_single.dll
+          
+          # Test if DLL is valid
+          echo ""
+          echo "Testing DLL..."
+          file ffmpeg_single.dll
+        else
+          echo "❌ Failed to create DLL"
+          exit 1
+        fi
     
-    - name: Upload
+    - name: Upload DLL
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg-complete-dll
+        name: ffmpeg-single-dll
         path: ffmpeg/ffmpeg_single.dll
