@@ -22,11 +22,12 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-nasm
+          mingw-w64-ucrt-x86_64-diffutils
           mingw-w64-ucrt-x86_64-libiconv
           mingw-w64-ucrt-x86_64-zlib
           make
     
-    - name: Configure FFmpeg for Static Build
+    - name: Configure FFmpeg (All static libs)
       shell: msys2 {0}
       run: |
         cd ffmpeg
@@ -34,13 +35,12 @@ jobs:
           --disable-shared \
           --enable-static \
           --enable-gpl \
+          --enable-version3 \
           --enable-avcodec \
           --enable-avformat \
           --enable-avutil \
           --enable-swscale \
-          --enable-decoder=h264,mpeg4,aac,mp3 \
-          --enable-demuxer=mp4,mov,avi,mkv \
-          --enable-protocol=file \
+          --enable-swresample \
           --disable-programs \
           --disable-doc \
           --disable-network \
@@ -48,32 +48,37 @@ jobs:
           --disable-lzma \
           --disable-iconv \
           --disable-zlib \
+          --disable-everything \
+          --enable-decoder=h264,mpeg4,aac,mp3 \
+          --enable-demuxer=mp4,mov,avi,mkv \
+          --enable-protocol=file \
           --extra-ldflags="-static-libgcc -static-libstdc++"
     
-    - name: Build FFmpeg
+    - name: Build
       shell: msys2 {0}
       run: |
         cd ffmpeg
         make -j4
         
-        # Verify static libraries were created
-        echo "Static libraries created:"
-        ls -la libavcodec/*.a | head -5
-        ls -la libavformat/*.a | head -5
-        ls -la libavutil/*.a | head -5
+        echo "✅ Build complete. Libraries:"
+        ls -la libavcodec/*.a | wc -l
+        ls -la libavformat/*.a | wc -l
+        ls -la libavutil/*.a | wc -l
+        ls -la libswresample/*.a | wc -l
     
-    - name: Create Single Combined DLL
+    - name: Create Single DLL with all dependencies
       shell: msys2 {0}
       run: |
         cd ffmpeg
         
-        # Create single DLL from static libraries
+        # Create single DLL including swresample
         gcc -shared -o ffmpeg_single.dll \
           -Wl,--whole-archive \
           libavcodec/libavcodec.a \
           libavformat/libavformat.a \
           libavutil/libavutil.a \
           libswscale/libswscale.a \
+          libswresample/libswresample.a \
           -Wl,--no-whole-archive \
           -static-libgcc \
           -static-libstdc++ \
@@ -88,19 +93,19 @@ jobs:
           -liconv \
           -lz
         
-        # Strip to reduce size
+        # Strip debug symbols
         strip ffmpeg_single.dll
         
-        echo "✅ Single DLL created successfully!"
+        echo "✅ Single DLL created!"
         ls -lh ffmpeg_single.dll
         
-        # Check if DLL works
+        # Verify exports
         echo ""
-        echo "Testing DLL..."
-        file ffmpeg_single.dll
+        echo "Exported symbols:"
+        nm -D ffmpeg_single.dll | grep " T " | head -10
     
-    - name: Upload Single DLL
+    - name: Upload
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg-single
+        name: ffmpeg-complete-dll
         path: ffmpeg/ffmpeg_single.dll
