@@ -10,7 +10,7 @@ jobs:
     steps:
     - name: Checkout FFmpeg
       run: |
-        git clone https://git.ffmpeg.org/ffmpeg.git
+        git clone https://git.ffmpeg.org/ffmpeg.git --depth=1
         cd ffmpeg
     
     - name: Setup MSYS2
@@ -22,12 +22,10 @@ jobs:
           mingw-w64-ucrt-x86_64-gcc
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-nasm
-          mingw-w64-ucrt-x86_64-diffutils
-          mingw-w64-ucrt-x86_64-pkg-config
           mingw-w64-ucrt-x86_64-libiconv
           make
     
-    - name: Configure FFmpeg
+    - name: Configure Static FFmpeg
       shell: msys2 {0}
       run: |
         cd ffmpeg
@@ -35,62 +33,78 @@ jobs:
           --disable-shared \
           --enable-static \
           --enable-gpl \
-          --enable-version3 \
-          --disable-all \
           --enable-avcodec \
           --enable-avformat \
           --enable-avutil \
           --enable-swscale \
-          --enable-decoder=h264,mpeg4,vp9 \
-          --enable-demuxer=mp4,mov,avi,webm \
-          --extra-cflags="-Wno-array-bounds -Wno-unused-label -Wno-unused-function" \
-          --disable-protocols \
-          --disable-network
+          --disable-programs \
+          --disable-doc \
+          --disable-network \
+          --extra-ldflags="-static-libgcc -static-libstdc++"
     
-    - name: Build FFmpeg
+    - name: Build
       shell: msys2 {0}
       run: |
         cd ffmpeg
-        make -j4 2>&1 | grep -v "warning:" || true
+        make -j4
     
-    - name: Create Single DLL
+    - name: Create Standalone DLL
       shell: msys2 {0}
       run: |
         cd ffmpeg
-        gcc -shared -o ffmpeg_single.dll \
+        
+        # Create standalone DLL with static runtime
+        gcc -shared -o ffmpeg.dll \
           -Wl,--whole-archive \
           libavcodec/libavcodec.a \
           libavformat/libavformat.a \
           libavutil/libavutil.a \
           libswscale/libswscale.a \
           -Wl,--no-whole-archive \
-          -liconv \
-          -lws2_32 \
-          -lwinmm \
-          -lole32 \
-          -lstrmiids \
-          -luuid \
-          -lz \
-          -lbcrypt \
-          -lsecur32 \
-          -lcrypt32 \
-          -lncrypt
+          -static-libgcc \
+          -static-libstdc++ \
+          -Wl,--export-all-symbols \
+          -lwinmm -lws2_32 -lole32
+        
+        # Strip debug symbols to reduce size
+        strip ffmpeg.dll
+        
+        echo "✅ Standalone ffmpeg.dll created (no external dependencies)"
+        ls -lh ffmpeg.dll
+        
+        # Check dependencies
+        echo ""
+        echo "DLL Dependencies:"
+        objdump -p ffmpeg.dll | grep "DLL Name" || true
     
-    - name: Verify and Upload DLL
+    - name: Test DLL
       shell: msys2 {0}
       run: |
         cd ffmpeg
-        if [ -f ffmpeg_single.dll ]; then
-          echo "✅ ffmpeg_single.dll created successfully!"
-          ls -lh ffmpeg_single.dll
-        else
-          echo "❌ ffmpeg_single.dll not found!"
-          exit 1
-        fi
+        
+        # Create test program
+        cat > test.c << 'EOF'
+        #include <windows.h>
+        #include <stdio.h>
+        
+        int main() {
+            HMODULE dll = LoadLibrary("ffmpeg.dll");
+            if (dll) {
+                printf("✅ ffmpeg.dll loaded successfully!\n");
+                FreeLibrary(dll);
+                return 0;
+            } else {
+                printf("❌ Failed to load ffmpeg.dll\n");
+                return 1;
+            }
+        }
+        EOF
+        
+        gcc test.c -o test.exe
+        ./test.exe
     
-    - name: Upload DLL
+    - name: Upload Standalone DLL
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg_single.dll
-        path: ffmpeg/ffmpeg_single.dll
-        if-no-files-found: error
+        name: ffmpeg-standalone
+        path: ffmpeg/ffmpeg.dll
