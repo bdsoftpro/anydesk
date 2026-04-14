@@ -23,20 +23,18 @@ jobs:
           mingw-w64-ucrt-x86_64-make
           mingw-w64-ucrt-x86_64-nasm
           mingw-w64-ucrt-x86_64-diffutils
-          mingw-w64-ucrt-x86_64-pkg-config
           make
     
-    - name: Configure Static FFmpeg
+    - name: Configure FFmpeg (Shared Build - Better for Dart)
       shell: msys2 {0}
       run: |
         cd ffmpeg
         
-        # Static configuration with all dependencies built-in
+        # Shared build - more compatible with Dart FFI
         ./configure \
-          --disable-shared \
-          --enable-static \
+          --enable-shared \
+          --disable-static \
           --enable-gpl \
-          --enable-version3 \
           --enable-avcodec \
           --enable-avformat \
           --enable-avutil \
@@ -51,108 +49,72 @@ jobs:
           --disable-zlib \
           --disable-everything \
           --enable-decoder=h264,mpeg4,aac,mp3 \
-          --enable-decoder=hevc,vp9 \
-          --enable-demuxer=mp4,mov,avi,mkv,webm \
-          --enable-protocol=file \
-          --enable-parser=h264,mpeg4video,aac \
-          --extra-ldflags="-static -static-libgcc -static-libstdc++ -Wl,-Bstatic" \
-          --extra-libs="-static-libgcc -static-libstdc++ -Wl,-Bstatic" \
-          --pkg-config-flags="--static"
+          --enable-demuxer=mp4,mov,avi,mkv \
+          --enable-protocol=file
     
-    - name: Build
+    - name: Build FFmpeg
       shell: msys2 {0}
       run: |
         cd ffmpeg
         make -j4
-        
-        echo "✅ Build complete!"
-        ls -la libavcodec/*.a | head -5
+        echo "✅ Build complete"
     
-    - name: Create Standalone Single DLL
+    - name: Create DLL Package
       shell: msys2 {0}
       run: |
         cd ffmpeg
         
-        # Create fully static single DLL with no dependencies
-        gcc -shared -o ffmpeg.dll \
-          -Wl,--whole-archive \
-          libavcodec/libavcodec.a \
-          libavformat/libavformat.a \
-          libavutil/libavutil.a \
-          libswscale/libswscale.a \
-          libswresample/libswresample.a \
-          -Wl,--no-whole-archive \
-          -static \
-          -static-libgcc \
-          -static-libstdc++ \
-          -Wl,--export-all-symbols \
-          -Wl,--kill-at \
-          -Wl,--strip-all \
-          -lwinmm \
-          -lws2_32 \
-          -lole32 \
-          -lstrmiids \
-          -luuid \
-          -lbcrypt \
-          -lsecur32 \
-          -Wl,-Bstatic
+        # Create output directory
+        mkdir -p dll_package
         
-        # Strip all debug symbols
-        strip --strip-all ffmpeg.dll
+        # Copy all DLLs
+        cp libavcodec/*.dll dll_package/ 2>/dev/null
+        cp libavformat/*.dll dll_package/ 2>/dev/null
+        cp libavutil/*.dll dll_package/ 2>/dev/null
+        cp libswscale/*.dll dll_package/ 2>/dev/null
+        cp libswresample/*.dll dll_package/ 2>/dev/null
         
-        # Verify the DLL has no external dependencies
-        echo ""
-        echo "=== Checking DLL dependencies ==="
-        objdump -p ffmpeg.dll | grep "DLL Name" || echo "✅ No external DLL dependencies found!"
+        # Copy MinGW runtime DLLs (required)
+        cp /ucrt64/bin/libgcc_s_seh-1.dll dll_package/ 2>/dev/null
+        cp /ucrt64/bin/libstdc++-6.dll dll_package/ 2>/dev/null
+        cp /ucrt64/bin/libwinpthread-1.dll dll_package/ 2>/dev/null
         
-        echo ""
-        echo "=== DLL Size ==="
-        ls -lh ffmpeg.dll
-        
-        echo ""
-        echo "✅ Standalone ffmpeg.dll created successfully!"
+        echo "✅ DLL package created"
+        ls -la dll_package/
     
-    - name: Test DLL
+    - name: Test DLLs
       shell: msys2 {0}
       run: |
-        cd ffmpeg
+        cd ffmpeg/dll_package
         
-        # Create simple test program
+        # Create test program
         cat > test.c << 'EOF'
         #include <windows.h>
         #include <stdio.h>
         
-        typedef int (*avcodec_version_func)();
-        
         int main() {
-            HMODULE dll = LoadLibrary("ffmpeg.dll");
-            if (!dll) {
-                printf("❌ Failed to load DLL\n");
-                return 1;
+            HMODULE avcodec = LoadLibrary("avcodec-62.dll");
+            HMODULE avformat = LoadLibrary("avformat-62.dll");
+            HMODULE avutil = LoadLibrary("avutil-60.dll");
+            
+            if (avcodec && avformat && avutil) {
+                printf("✅ All DLLs loaded successfully!\n");
+                FreeLibrary(avcodec);
+                FreeLibrary(avformat);
+                FreeLibrary(avutil);
+                return 0;
             }
             
-            avcodec_version_func avcodec_version = (avcodec_version_func)GetProcAddress(dll, "avcodec_version");
-            if (avcodec_version) {
-                int version = avcodec_version();
-                printf("✅ FFmpeg loaded! Version: %d.%d.%d\n", 
-                       version >> 16, (version >> 8) & 0xFF, version & 0xFF);
-            } else {
-                printf("⚠️ Could not find avcodec_version\n");
-            }
-            
-            FreeLibrary(dll);
-            return 0;
+            printf("❌ Failed to load DLLs\n");
+            return 1;
         }
         EOF
         
-        # Compile test
         gcc test.c -o test.exe
-        
-        # Run test
         ./test.exe
     
-    - name: Upload Standalone DLL
+    - name: Upload DLLs
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg-standalone
-        path: ffmpeg/ffmpeg.dll
+        name: ffmpeg-dlls
+        path: ffmpeg/dll_package/
