@@ -8,113 +8,80 @@ jobs:
     runs-on: windows-latest
     
     steps:
-    - name: Checkout FFmpeg
+    - name: Download FFmpeg Shared DLLs
       run: |
-        git clone https://git.ffmpeg.org/ffmpeg.git --depth=1
-        cd ffmpeg
-    
-    - name: Setup MSYS2
-      uses: msys2/setup-msys2@v2
-      with:
-        msystem: UCRT64
-        update: true
-        install: |
-          mingw-w64-ucrt-x86_64-gcc
-          mingw-w64-ucrt-x86_64-make
-          mingw-w64-ucrt-x86_64-nasm
-          mingw-w64-ucrt-x86_64-diffutils
-          make
-    
-    - name: Configure FFmpeg (Shared Build - Better for Dart)
-      shell: msys2 {0}
-      run: |
-        cd ffmpeg
+        # Download pre-built shared DLLs
+        $url = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-full-shared.7z"
+        Invoke-WebRequest -Uri $url -OutFile ffmpeg.7z
         
-        # Shared build - more compatible with Dart FFI
-        ./configure \
-          --enable-shared \
-          --disable-static \
-          --enable-gpl \
-          --enable-avcodec \
-          --enable-avformat \
-          --enable-avutil \
-          --enable-swscale \
-          --enable-swresample \
-          --disable-programs \
-          --disable-doc \
-          --disable-network \
-          --disable-bzlib \
-          --disable-lzma \
-          --disable-iconv \
-          --disable-zlib \
-          --disable-everything \
-          --enable-decoder=h264,mpeg4,aac,mp3 \
-          --enable-demuxer=mp4,mov,avi,mkv \
-          --enable-protocol=file
-    
-    - name: Build FFmpeg
-      shell: msys2 {0}
-      run: |
-        cd ffmpeg
-        make -j4
-        echo "✅ Build complete"
-    
-    - name: Create DLL Package
-      shell: msys2 {0}
-      run: |
-        cd ffmpeg
+        # Extract
+        & "C:\Program Files\7-Zip\7z.exe" x ffmpeg.7z -oFFmpeg -y
         
-        # Create output directory
-        mkdir -p dll_package
+        # Find bin folder
+        $binPath = Get-ChildItem -Path FFmpeg -Directory -Filter "ffmpeg-*" | Select-Object -First 1
+        $binPath = Join-Path $binPath.FullName "bin"
         
         # Copy all DLLs
-        cp libavcodec/*.dll dll_package/ 2>/dev/null
-        cp libavformat/*.dll dll_package/ 2>/dev/null
-        cp libavutil/*.dll dll_package/ 2>/dev/null
-        cp libswscale/*.dll dll_package/ 2>/dev/null
-        cp libswresample/*.dll dll_package/ 2>/dev/null
+        New-Item -ItemType Directory -Force -Path dlls
+        Copy-Item "$binPath\*.dll" -Destination dlls\
         
-        # Copy MinGW runtime DLLs (required)
-        cp /ucrt64/bin/libgcc_s_seh-1.dll dll_package/ 2>/dev/null
-        cp /ucrt64/bin/libstdc++-6.dll dll_package/ 2>/dev/null
-        cp /ucrt64/bin/libwinpthread-1.dll dll_package/ 2>/dev/null
-        
-        echo "✅ DLL package created"
-        ls -la dll_package/
+        Write-Host "✅ DLLs copied"
     
-    - name: Test DLLs
-      shell: msys2 {0}
+    - name: Combine DLLs into Single DLL
       run: |
-        cd ffmpeg/dll_package
+        # Install Microsoft Visual Studio build tools
+        choco install visualstudio2022buildtools -y
+        choco install windows-sdk-11 -y
         
-        # Create test program
-        cat > test.c << 'EOF'
-        #include <windows.h>
-        #include <stdio.h>
+        # Set up VS environment
+        $vcVarsPath = "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
         
-        int main() {
-            HMODULE avcodec = LoadLibrary("avcodec-62.dll");
-            HMODULE avformat = LoadLibrary("avformat-62.dll");
-            HMODULE avutil = LoadLibrary("avutil-60.dll");
-            
-            if (avcodec && avformat && avutil) {
-                printf("✅ All DLLs loaded successfully!\n");
-                FreeLibrary(avcodec);
-                FreeLibrary(avformat);
-                FreeLibrary(avutil);
-                return 0;
-            }
-            
-            printf("❌ Failed to load DLLs\n");
-            return 1;
-        }
-        EOF
+        # Create .def file for exports
+        @"
+        EXPORTS
+        avcodec_version
+        avformat_version
+        avutil_version
+        swscale_version
+        avcodec_find_decoder
+        avcodec_alloc_context3
+        avcodec_open2
+        avcodec_free_context
+        av_packet_alloc
+        av_packet_free
+        av_packet_unref
+        av_read_frame
+        avformat_open_input
+        avformat_find_stream_info
+        avformat_close_input
+        av_seek_frame
+        av_new_packet
+        av_init_packet
+        "@ | Out-File -FilePath exports.def -Encoding ascii
         
-        gcc test.c -o test.exe
-        ./test.exe
+        # Combine all DLLs using lib.exe
+        & "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.40.33807\bin\Hostx64\x64\lib.exe" `
+          /OUT:combined.lib `
+          /MACHINE:X64 `
+          dlls\avcodec-62.dll `
+          dlls\avformat-62.dll `
+          dlls\avutil-60.dll `
+          dlls\swscale-8.dll
+        
+        # Create single DLL
+        & "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.40.33807\bin\Hostx64\x64\link.exe" `
+          /DLL `
+          /OUT:ffmpeg.dll `
+          /DEF:exports.def `
+          /LIBPATH:"C:\Program Files (x86)\Windows Kits\10\Lib\10.0.22621.0\um\x64" `
+          combined.lib `
+          kernel32.lib user32.lib gdi32.lib winmm.lib ws2_32.lib ole32.lib
+        
+        Write-Host "✅ Single DLL created!"
+        Get-Item ffmpeg.dll | Select-Object Name, Length
     
-    - name: Upload DLLs
+    - name: Upload Single DLL
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg-dlls
-        path: ffmpeg/dll_package/
+        name: ffmpeg-single
+        path: ffmpeg.dll
