@@ -26,18 +26,21 @@ jobs:
           mingw-w64-ucrt-x86_64-zlib
           make
     
-    - name: Configure FFmpeg for Shared Build
+    - name: Configure FFmpeg for Static Build
       shell: msys2 {0}
       run: |
         cd ffmpeg
         ./configure \
-          --enable-shared \
-          --disable-static \
+          --disable-shared \
+          --enable-static \
           --enable-gpl \
           --enable-avcodec \
           --enable-avformat \
           --enable-avutil \
           --enable-swscale \
+          --enable-decoder=h264,mpeg4,aac,mp3 \
+          --enable-demuxer=mp4,mov,avi,mkv \
+          --enable-protocol=file \
           --disable-programs \
           --disable-doc \
           --disable-network \
@@ -45,58 +48,59 @@ jobs:
           --disable-lzma \
           --disable-iconv \
           --disable-zlib \
-          --disable-everything \
-          --enable-decoder=h264,mpeg4,aac,mp3 \
-          --enable-demuxer=mp4,mov,avi,mkv \
-          --enable-protocol=file \
-          --extra-ldflags="-Wl,--output-def=ffmpeg.def"
+          --extra-ldflags="-static-libgcc -static-libstdc++"
     
-    - name: Build
+    - name: Build FFmpeg
       shell: msys2 {0}
       run: |
         cd ffmpeg
         make -j4
+        
+        # Verify static libraries were created
+        echo "Static libraries created:"
+        ls -la libavcodec/*.a | head -5
+        ls -la libavformat/*.a | head -5
+        ls -la libavutil/*.a | head -5
     
-    - name: Create DLL Package
+    - name: Create Single Combined DLL
       shell: msys2 {0}
       run: |
         cd ffmpeg
         
-        # Copy DLLs to package folder
-        mkdir -p dll_package
-        
-        # Copy FFmpeg DLLs
-        cp libavcodec/*.dll dll_package/
-        cp libavformat/*.dll dll_package/
-        cp libavutil/*.dll dll_package/
-        cp libswscale/*.dll dll_package/
-        
-        # Copy MinGW runtime DLLs
-        cp /ucrt64/bin/libgcc_s_seh-1.dll dll_package/
-        cp /ucrt64/bin/libstdc++-6.dll dll_package/
-        cp /ucrt64/bin/libwinpthread-1.dll dll_package/
-        cp /ucrt64/bin/libiconv-2.dll dll_package/
-        cp /ucrt64/bin/zlib1.dll dll_package/
-        
-        # Create a single combined DLL
-        echo "Creating combined DLL..."
-        gcc -shared -o dll_package/ffmpeg_combined.dll \
+        # Create single DLL from static libraries
+        gcc -shared -o ffmpeg_single.dll \
           -Wl,--whole-archive \
           libavcodec/libavcodec.a \
           libavformat/libavformat.a \
           libavutil/libavutil.a \
           libswscale/libswscale.a \
           -Wl,--no-whole-archive \
+          -static-libgcc \
+          -static-libstdc++ \
           -Wl,--export-all-symbols \
-          -lwinmm -lws2_32 -lole32 -lstrmiids -luuid -lbcrypt -lsecur32 -lz -liconv
+          -lwinmm \
+          -lws2_32 \
+          -lole32 \
+          -lstrmiids \
+          -luuid \
+          -lbcrypt \
+          -lsecur32 \
+          -liconv \
+          -lz
         
-        strip dll_package/ffmpeg_combined.dll
+        # Strip to reduce size
+        strip ffmpeg_single.dll
         
-        echo "✅ Package created!"
-        ls -lh dll_package/
+        echo "✅ Single DLL created successfully!"
+        ls -lh ffmpeg_single.dll
+        
+        # Check if DLL works
+        echo ""
+        echo "Testing DLL..."
+        file ffmpeg_single.dll
     
-    - name: Upload Package
+    - name: Upload Single DLL
       uses: actions/upload-artifact@v4
       with:
-        name: ffmpeg-shared-package
-        path: ffmpeg/dll_package/
+        name: ffmpeg-single
+        path: ffmpeg/ffmpeg_single.dll
