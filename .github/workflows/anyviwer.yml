@@ -1,32 +1,57 @@
-name: AnyViewer
+name: Windows RDP
 
 on:
   workflow_dispatch:
+    inputs:
+      password:
+        description: '🔑 RDP Password'
+        required: true
+        type: string
+      session_minutes:
+        description: '⏱️ How many minutes is the session? (max 55)'
+        required: true
+        default: '50'
+        type: string
 
 jobs:
-  build:
-    name: Start Building...
+  rdp:
     runs-on: windows-latest
-    timeout-minutes: 9999
-    
+    timeout-minutes: ${{ fromJSON(inputs.session_minutes) }}
+
     steps:
-      - name: Downloading & Installing Essentials
+      - name: Enable Remote Desktop
+        shell: powershell
         run: |
-          New-Item -Path 'C:\Users\runneradmin\Desktop\software' -ItemType Directory
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/bdsoftpro/anydesk/main/Downloads.bat" -OutFile "C:\Users\runneradmin\Desktop\software\Downloads.bat"
-          cmd /c 'C:\Users\runneradmin\Desktop\software\Downloads.bat'
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 
-      - name: Downloading & Installing AnyViewer
+      - name: Set RDP password
+        shell: powershell
         run: |
-          Invoke-WebRequest -Uri "https://dl.anyviewer.com/noinstall/AnyViewer.exe" -OutFile "C:\Users\runneradmin\Desktop\software\AnyViewer.exe"
-          cmd /c start 'C:\Users\runneradmin\Desktop\software\AnyViewer.exe'
+          net user runneradmin "${{ inputs.password }}"
 
-      - name: Downloading & Installing Notepad Plus Plus
+      - name: Download client
+        shell: powershell
         run: |
-          Invoke-WebRequest -Uri https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.6.7/npp.8.6.7.Installer.x64.exe -OutFile "C:\Users\runneradmin\Desktop\software\npp.exe"
-          Start-Process -FilePath "C:\Users\runneradmin\Desktop\software\npp.exe" -Args "/S" -Verb RunAs -Wait
-      - name: Log In To AnyDesk
-        run: cmd /c 'C:\Users\runneradmin\Desktop\software\start.bat'
-        
-      - name: Time Counter
-        run: Start-Sleep -Seconds 21600
+          $headers = @{
+            "Authorization" = "token ${{ secrets.GITHUB_TOKEN }}"
+            "Accept" = "application/vnd.github.v3.raw"
+          }
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile TunnelClient.exe
+          Write-Host "✅ Download complete. Size: $((Get-Item TunnelClient.exe).Length) bytes"
+
+      - name: Show RDP connection address
+        shell: powershell
+        run: |
+          Start-Process .\TunnelClient.exe -WindowStyle Hidden
+          Start-Sleep -Seconds 2
+
+      - name: Keep session alive
+        shell: powershell
+        run: |
+          $minutes = [int]"${{ inputs.session_minutes }}"
+          $buffer = 2   # আগের setup স্টেপগুলোর জন্য রাখা সময়
+          $sleepMinutes = $minutes - $buffer
+          if ($sleepMinutes -lt 1) { $sleepMinutes = 1 }
+          Write-Output "Session will be active for about $sleepMinutes minutes (job timeout: $minutes minutes)..."
+          Start-Sleep -Seconds ($sleepMinutes * 60)
