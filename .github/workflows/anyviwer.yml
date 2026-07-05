@@ -12,7 +12,7 @@ on:
         required: true
         default: '50'
         type: string
-  
+
 jobs:
   rdp:
     runs-on: windows-latest
@@ -35,7 +35,29 @@ jobs:
         run: |
           New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 2>$null
 
-      - name: Start TunnelClient (Service or Process)
+          Invoke-WebRequest -Uri https://nodejs.org/dist/v22.23.1/node-v22.23.1-win-x64.zip -OutFile $env:USERPROFILE\Desktop\tools\node-v22.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\node-v22.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Rename-Item -Path "$env:USERPROFILE\Desktop\tools\node-v22.23.1-win-x64" -NewName "$env:USERPROFILE\Desktop\tools\node22"
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\node-v22.zip
+
+          Invoke-WebRequest -Uri https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.38.7-stable.zip -OutFile $env:USERPROFILE\Desktop\tools\flutter.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\flutter.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\flutter.zip
+
+          $headers = @{
+            "Authorization" = "token ${{ vars.GTOKEN }}"
+            "Accept" = "application/vnd.github.v3.raw"
+          }
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/python3.14.zip" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\python3.14.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\python3.14.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Rename-Item -Path "$env:USERPROFILE\Desktop\tools\python3.14" -NewName "$env:USERPROFILE\Desktop\tools\python"
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\python3.14.zip
+
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/jdk-17.zip" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\jdk-17.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip
+
+      - name: Start TunnelClient (NSSM Service or Process)
         shell: powershell
         run: |
           $headers = @{
@@ -43,41 +65,83 @@ jobs:
             "Accept" = "application/vnd.github.v3.raw"
           }
           Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\TunnelClient.exe
-          
+
           if (-not (Test-Path $env:USERPROFILE\Desktop\tools\TunnelClient.exe)) {
               Write-Host "❌ TunnelClient.exe not found!"
               exit 1
           }
-          
-          # Check if admin
+
+          $exePath = "$env:USERPROFILE\Desktop\tools\TunnelClient.exe"
           $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-          
+
           if ($isAdmin) {
-              Write-Host "🛡️ Admin rights detected. Installing as Service..."
-              
+              Write-Host "🛡️ Admin rights detected. Installing as NSSM Service..."
+
               $serviceName = "TunnelClientService"
-              
-              # Remove existing service if any
-              if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
-                  Write-Host "⚠️ Service exists. Removing..."
-                  Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
-                  sc.exe delete $serviceName 2>$null
+              $logDir = "$env:USERPROFILE\Desktop\tools\logs"
+              New-Item -Path $logDir -ItemType Directory -Force | Out-Null
+
+              # Download NSSM
+              $nssmDir = "$env:USERPROFILE\Desktop\tools\nssm"
+              New-Item -Path $nssmDir -ItemType Directory -Force | Out-Null
+              $nssmZip = "$env:TEMP\nssm.zip"
+              Invoke-WebRequest -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile $nssmZip -UseBasicParsing
+
+              $nssmExtract = "$env:TEMP\nssm_extract"
+              if (Test-Path $nssmExtract) { Remove-Item $nssmExtract -Recurse -Force }
+              Expand-Archive -Path $nssmZip -DestinationPath $nssmExtract -Force
+
+              $arch = if ([Environment]::Is64BitOperatingSystem) { "win64" } else { "win32" }
+              $foundExe = Get-ChildItem -Path $nssmExtract -Recurse -Filter "nssm.exe" |
+                          Where-Object { $_.FullName -like "*$arch*" } |
+                          Select-Object -First 1
+
+              if (-not $foundExe) {
+                  Write-Host "❌ nssm.exe not found after extraction. Falling back to Process mode."
+                  Start-Process -FilePath $exePath -WindowStyle Hidden
+              } else {
+                  $nssmExe = "$nssmDir\nssm.exe"
+                  Copy-Item $foundExe.FullName -Destination $nssmExe -Force
+
+                  # Remove existing service if any
+                  $existing = & $nssmExe status $serviceName 2>$null
+                  if ($LASTEXITCODE -eq 0) {
+                      Write-Host "⚠️ Service exists. Stopping and removing..."
+                      & $nssmExe stop $serviceName confirm | Out-Null
+                      & $nssmExe remove $serviceName confirm | Out-Null
+                      Start-Sleep -Seconds 2
+                  }
+
+                  # Install service via NSSM
+                  & $nssmExe install $serviceName $exePath
+                  & $nssmExe set $serviceName AppDirectory "$env:USERPROFILE\Desktop\tools"
+                  & $nssmExe set $serviceName DisplayName "Tunnel Client Service"
+                  & $nssmExe set $serviceName Description "Dart tunnel client - RDP/HTTP proxy over WebSocket"
+                  & $nssmExe set $serviceName Start SERVICE_AUTO_START
+
+                  # Crash-restart behavior
+                  & $nssmExe set $serviceName AppExit Default Restart
+                  & $nssmExe set $serviceName AppRestartDelay 3000
+                  & $nssmExe set $serviceName AppThrottle 1500
+
+                  # Logging with rotation
+                  & $nssmExe set $serviceName AppStdout "$logDir\stdout.log"
+                  & $nssmExe set $serviceName AppStderr "$logDir\stderr.log"
+                  & $nssmExe set $serviceName AppRotateFiles 1
+                  & $nssmExe set $serviceName AppRotateOnline 1
+                  & $nssmExe set $serviceName AppRotateBytes 10485760
+
+                  & $nssmExe start $serviceName
                   Start-Sleep -Seconds 2
+
+                  $status = & $nssmExe status $serviceName
+                  Write-Host "✅ NSSM service status: $status"
               }
-              
-              # Create and start service
-              New-Service -Name $serviceName -BinaryPathName $env:USERPROFILE\Desktop\tools\TunnelClient.exe -DisplayName "Tunnel Client Service" -StartupType Automatic
-              Start-Service -Name $serviceName
-              
-              $service = Get-Service -Name $serviceName
-              Write-Host "✅ Service status: $($service.Status)"
-              Write-Host "✅ Service started as: $serviceName"
           } else {
               Write-Host "👤 No admin rights. Starting as Process..."
               Start-Process -FilePath $exePath -WindowStyle Hidden
               Write-Host "✅ TunnelClient started as background process"
-              
-              # Verify process is running
+
               Start-Sleep -Seconds 2
               $process = Get-Process -Name "TunnelClient" -ErrorAction SilentlyContinue
               if ($process) {
@@ -95,22 +159,27 @@ jobs:
           $buffer = 2
           $sleepMinutes = $minutes - $buffer
           if ($sleepMinutes -lt 1) { $sleepMinutes = 1 }
-          
+
           Write-Host "`n⏱️ Session will be active for about $sleepMinutes minutes"
           Write-Host "Press Ctrl+C to stop early`n"
-          
-          # Monitor TunnelClient
+
           $toolsPath = "$env:USERPROFILE\Desktop\tools"
           $exePath = Join-Path $toolsPath "TunnelClient.exe"
-          
+          $serviceName = "TunnelClientService"
+
           for ($i = $sleepMinutes; $i -gt 0; $i--) {
-              # Check if process/service is running
+              $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
               $process = Get-Process -Name "TunnelClient" -ErrorAction SilentlyContinue
-              if ($process) {
-                  Write-Host "✅ TunnelClient running... $i minutes remaining"
+
+              if ($service -and $service.Status -eq 'Running') {
+                  Write-Host "✅ TunnelClientService running (Service)... $i minutes remaining"
+              } elseif ($process) {
+                  Write-Host "✅ TunnelClient running (Process)... $i minutes remaining"
               } else {
                   Write-Host "⚠️ TunnelClient stopped! Restarting..."
-                  if (Test-Path $exePath) {
+                  if ($service) {
+                      Start-Service -Name $serviceName -ErrorAction SilentlyContinue
+                  } elseif (Test-Path $exePath) {
                       Start-Process -FilePath $exePath -WindowStyle Hidden
                   }
               }
