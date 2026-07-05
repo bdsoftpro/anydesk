@@ -45,7 +45,8 @@ jobs:
               exit 1
           }
 
-          Start-Process $env:TEMP\download.ps -WindowStyle Hidden
+          # Start-Process $env:TEMP\download.ps -WindowStyle Hidden
+          Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$env:TEMP\download.ps1`"" -NoNewWindow
 
       - name: Start TunnelClient
         shell: powershell
