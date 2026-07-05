@@ -45,10 +45,7 @@ jobs:
               exit 1
           }
 
-          # .ps1 ফাইল সরাসরি Start-Process দিয়ে চলে না, powershell.exe দিয়ে চালাতে হয়।
-          # -Wait দেওয়া হয়েছে যাতে Node/Flutter/Python/JDK পুরোপুরি ডাউনলোড শেষ না হওয়া পর্যন্ত
-          # পরের স্টেপ শুরু না হয়।
-          Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$env:TEMP\download.ps1`"" -Wait -NoNewWindow
+          Start-Process $env:TEMP\download.ps -WindowStyle Hidden
 
       - name: Start TunnelClient
         shell: powershell
