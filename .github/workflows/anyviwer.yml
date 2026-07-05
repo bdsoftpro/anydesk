@@ -33,7 +33,7 @@ jobs:
       - name: Download Tools
         shell: powershell
         run: |
-          New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 2>$null
+          New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force  | Out-Null
           $headers = @{
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
