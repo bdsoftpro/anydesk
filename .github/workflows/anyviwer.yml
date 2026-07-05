@@ -34,29 +34,29 @@ jobs:
         shell: powershell
         run: |
           Write-Host "✅ Working directory: $env:ProgramFiles"
-          New-Item -Path "C:\Users\runneradmin\Desktop\tools" -ItemType Directory -Force
-          # Set-Location -Path "C:\Users\runneradmin\Desktop\tools"
-          Invoke-WebRequest -Uri https://nodejs.org/dist/v22.23.1/node-v22.23.1-win-x64.zip -OutFile tools\node-v22.zip
-          Expand-Archive -Path tools\node-v22.zip -DestinationPath tools\ -Force
-          Rename-Item -Path "tools\node-v22.23.1-win-x64" -NewName "tools\node22"
-          Remove-Item -Path tools\node-v22.zip
+          New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force
+          # Set-Location -Path "$env:USERPROFILE\Desktop\tools"
+          Invoke-WebRequest -Uri https://nodejs.org/dist/v22.23.1/node-v22.23.1-win-x64.zip -OutFile $env:USERPROFILE\Desktop\tools\node-v22.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\node-v22.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Rename-Item -Path "$env:USERPROFILE\Desktop\tools\node-v22.23.1-win-x64" -NewName "$env:USERPROFILE\Desktop\tools\node22"
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\node-v22.zip
           
-          Invoke-WebRequest -Uri https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.38.7-stable.zip -OutFile tools\flutter.zip
-          Expand-Archive -Path tools\flutter.zip -DestinationPath tools\ -Force
-          Remove-Item -Path tools\flutter.zip
+          Invoke-WebRequest -Uri https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.38.7-stable.zip -OutFile $env:USERPROFILE\Desktop\tools\flutter.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\flutter.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\flutter.zip
           
           $headers = @{
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/python3.14.zip" -Headers $headers -OutFile tools\python3.14.zip
-          Expand-Archive -Path tools\python3.14.zip -DestinationPath tools\ -Force
-          Rename-Item -Path "tools\python3.14" -NewName "tools\python"
-          Remove-Item -Path tools\python3.14.zip
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/python3.14.zip" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\python3.14.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\python3.14.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Rename-Item -Path "$env:USERPROFILE\Desktop\tools\python3.14" -NewName "$env:USERPROFILE\Desktop\tools\python"
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\python3.14.zip
 
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/jdk-17.zip" -Headers $headers -OutFile tools\jdk-17.zip
-          Expand-Archive -Path tools\jdk-17.zip -DestinationPath tools\ -Force
-          Remove-Item -Path tools\jdk-17.zip
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/jdk-17.zip" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\jdk-17.zip
+          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
+          Remove-Item -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip
 
       - name: Download client
         shell: powershell
@@ -65,13 +65,13 @@ jobs:
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile TunnelClient.exe
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:ProgramFiles\TunnelClient.exe
           Write-Host "✅ Download complete. Size: $((Get-Item TunnelClient.exe).Length) bytes"
 
       - name: Show RDP connection address
         shell: powershell
         run: |
-          Start-Process .\TunnelClient.exe -WindowStyle Hidden
+          Start-Process TunnelClient.exe -WindowStyle Hidden
           Start-Sleep -Seconds 2
 
       - name: Keep session alive
