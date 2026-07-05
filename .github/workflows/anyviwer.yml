@@ -34,25 +34,6 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 2>$null
-          # Set-Location -Path "$env:USERPROFILE\Desktop\tools"
-          Invoke-WebRequest -Uri https://nodejs.org/dist/v22.23.1/node-v22.23.1-win-x64.zip -OutFile $env:USERPROFILE\Desktop\tools\node-v22.zip
-          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\node-v22.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
-          Rename-Item -Path "$env:USERPROFILE\Desktop\tools\node-v22.23.1-win-x64" -NewName "$env:USERPROFILE\Desktop\tools\node22"
-          Remove-Item -Path $env:USERPROFILE\Desktop\tools\node-v22.zip
-          
-          Invoke-WebRequest -Uri https://storage.googleapis.com/flutter_infra_release/releases/stable/windows/flutter_windows_3.38.7-stable.zip -OutFile $env:USERPROFILE\Desktop\tools\flutter.zip
-          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\flutter.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
-          Remove-Item -Path $env:USERPROFILE\Desktop\tools\flutter.zip
-          
-          $headers = @{
-            "Authorization" = "token ${{ vars.GTOKEN }}"
-            "Accept" = "application/vnd.github.v3.raw"
-          }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/python3.14.zip" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\python3.14.zip
-          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\python3.14.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
-          Rename-Item -Path "$env:USERPROFILE\Desktop\tools\python3.14" -NewName "$env:USERPROFILE\Desktop\tools\python"
-          Remove-Item -Path $env:USERPROFILE\Desktop\tools\python3.14.zip
-
 
       - name: Start TunnelClient (Service or Process)
         shell: powershell
