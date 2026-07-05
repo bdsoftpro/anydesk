@@ -34,9 +34,18 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 2>$null
+          $headers = @{
+            "Authorization" = "token ${{ vars.GTOKEN }}"
+            "Accept" = "application/vnd.github.v3.raw"
+          }
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1" -Headers $headers -OutFile -OutFile $env:TEMP\download.ps1 -UseBasicParsing
 
+          if (-not (Test-Path $env:TEMP\download.ps1)) {
+              Write-Host "❌ Download.ps1 not found!"
+              exit 1
+          }
 
-      - name: Start TunnelClient (NSSM Service or Process)
+      - name: Start TunnelClient
         shell: powershell
         run: |
           $headers = @{
