@@ -40,7 +40,7 @@ jobs:
           }
           Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\download.ps1 -UseBasicParsing
 
-          if (-not (Test-Path $env:TEMP\download.ps1)) {
+          if (-not (Test-Path $env:USERPROFILE\Desktop\tools\download.ps1)) {
               Write-Host "❌ Download.ps1 not found!"
               exit 1
           }
