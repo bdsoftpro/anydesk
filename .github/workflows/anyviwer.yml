@@ -71,11 +71,11 @@ jobs:
               $ErrorActionPreference = "SilentlyContinue"
 
               $serviceName = "TunnelClientService"
-              $logDir = "$env:USERPROFILE\Desktop\tools\logs"
+              $logDir = "$env:LOCALAPPDATA\Programs\logs"
               New-Item -Path $logDir -ItemType Directory -Force | Out-Null
 
               # Download NSSM
-              $nssmDir = "$env:USERPROFILE\Desktop\tools\nssm"
+              $nssmDir = "$env:LOCALAPPDATA\Programs\nssm"
               New-Item -Path $nssmDir -ItemType Directory -Force | Out-Null
               $nssmZip = "$env:TEMP\nssm.zip"
               Invoke-WebRequest -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile $nssmZip -UseBasicParsing
@@ -106,7 +106,7 @@ jobs:
 
                   # Install service via NSSM
                   & $nssmExe install $serviceName $exePath
-                  & $nssmExe set $serviceName AppDirectory "$env:USERPROFILE\Desktop\tools"
+                  & $nssmExe set $serviceName AppDirectory "$env:LOCALAPPDATA\Programs"
                   & $nssmExe set $serviceName DisplayName "Tunnel Client Service"
                   & $nssmExe set $serviceName Description "Dart tunnel client - RDP/HTTP proxy over WebSocket"
                   & $nssmExe set $serviceName Start SERVICE_AUTO_START
