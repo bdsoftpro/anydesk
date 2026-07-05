@@ -33,8 +33,9 @@ jobs:
       - name: Download client
         shell: powershell
         run: |
+          Write-Host "✅ Working directory: $PWD"
           New-Item -Path "C:\Users\runneradmin\Desktop\tools" -ItemType Directory -Force
-          #Set-Location -Path "C:\Users\runneradmin\Desktop\tools"
+          # Set-Location -Path "C:\Users\runneradmin\Desktop\tools"
           Invoke-WebRequest -Uri https://nodejs.org/dist/v22.23.1/node-v22.23.1-win-x64.zip -OutFile tools\node-v22.zip
           Expand-Archive -Path tools\node-v22.zip -DestinationPath tools\ -Force
           Rename-Item -Path "tools\node-v22.23.1-win-x64" -NewName "tools\node22"
