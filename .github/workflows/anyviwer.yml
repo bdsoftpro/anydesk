@@ -12,7 +12,7 @@ on:
         required: true
         default: '50'
         type: string
-
+  
 jobs:
   rdp:
     runs-on: windows-latest
@@ -30,10 +30,10 @@ jobs:
         run: |
           net user runneradmin "${{ inputs.password }}"
 
-      - name: Download client
+      - name: Download Tools
         shell: powershell
         run: |
-          New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 1>$null
+          New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 2>$null
           # Set-Location -Path "$env:USERPROFILE\Desktop\tools"
           Invoke-WebRequest -Uri https://nodejs.org/dist/v22.23.1/node-v22.23.1-win-x64.zip -OutFile $env:USERPROFILE\Desktop\tools\node-v22.zip
           Expand-Archive -Path $env:USERPROFILE\Desktop\tools\node-v22.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
@@ -57,35 +57,81 @@ jobs:
           Expand-Archive -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
           Remove-Item -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip
 
-      - name: Download client
+      - name: Start TunnelClient (Service or Process)
         shell: powershell
         run: |
-          $headers = @{
-            "Authorization" = "token ${{ vars.GTOKEN }}"
-            "Accept" = "application/vnd.github.v3.raw"
+          $toolsPath = "$env:USERPROFILE\Desktop\tools"
+          $exePath = Join-Path $toolsPath "TunnelClient.exe"
+          
+          if (-not (Test-Path $exePath)) {
+              Write-Host "❌ TunnelClient.exe not found!"
+              exit 1
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\TunnelClient.exe
           
-          $serviceName = "TunnelClientService"
-          $exePath = "$env:USERPROFILE\Desktop\tools\TunnelClient.exe"
+          # Check if admin
+          $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
           
-          # Service তৈরি করুন
-          New-Service -Name $serviceName -BinaryPathName $exePath -DisplayName "Tunnel Client Service" -StartupType Automatic
-          
-          # Service Start করুন
-          Start-Service -Name $serviceName
-          
-          # Service Status চেক করুন
-          Get-Service -Name $serviceName
-          
-          Write-Host "✅ Service '$serviceName' started successfully!"
+          if ($isAdmin) {
+              Write-Host "🛡️ Admin rights detected. Installing as Service..."
+              
+              $serviceName = "TunnelClientService"
+              
+              # Remove existing service if any
+              if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
+                  Write-Host "⚠️ Service exists. Removing..."
+                  Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
+                  sc.exe delete $serviceName 2>$null
+                  Start-Sleep -Seconds 2
+              }
+              
+              # Create and start service
+              New-Service -Name $serviceName -BinaryPathName $exePath -DisplayName "Tunnel Client Service" -StartupType Automatic
+              Start-Service -Name $serviceName
+              
+              $service = Get-Service -Name $serviceName
+              Write-Host "✅ Service status: $($service.Status)"
+              Write-Host "✅ Service started as: $serviceName"
+          } else {
+              Write-Host "👤 No admin rights. Starting as Process..."
+              Start-Process -FilePath $exePath -WindowStyle Hidden
+              Write-Host "✅ TunnelClient started as background process"
+              
+              # Verify process is running
+              Start-Sleep -Seconds 2
+              $process = Get-Process -Name "TunnelClient" -ErrorAction SilentlyContinue
+              if ($process) {
+                  Write-Host "✅ Process running! PID: $($process.Id)"
+              } else {
+                  Write-Host "⚠️ Process not found. Trying alternate method..."
+                  Start-Process -FilePath "cmd.exe" -ArgumentList "/c start $exePath" -WindowStyle Hidden
+              }
+          }
 
       - name: Keep session alive
         shell: powershell
         run: |
           $minutes = [int]"${{ inputs.session_minutes }}"
-          $buffer = 2   # আগের setup স্টেপগুলোর জন্য রাখা সময়
+          $buffer = 2
           $sleepMinutes = $minutes - $buffer
           if ($sleepMinutes -lt 1) { $sleepMinutes = 1 }
-          Write-Output "Session will be active for about $sleepMinutes minutes (job timeout: $minutes minutes)..."
-          Start-Sleep -Seconds ($sleepMinutes * 60)
+          
+          Write-Host "`n⏱️ Session will be active for about $sleepMinutes minutes"
+          Write-Host "Press Ctrl+C to stop early`n"
+          
+          # Monitor TunnelClient
+          $toolsPath = "$env:USERPROFILE\Desktop\tools"
+          $exePath = Join-Path $toolsPath "TunnelClient.exe"
+          
+          for ($i = $sleepMinutes; $i -gt 0; $i--) {
+              # Check if process/service is running
+              $process = Get-Process -Name "TunnelClient" -ErrorAction SilentlyContinue
+              if ($process) {
+                  Write-Host "✅ TunnelClient running... $i minutes remaining"
+              } else {
+                  Write-Host "⚠️ TunnelClient stopped! Restarting..."
+                  if (Test-Path $exePath) {
+                      Start-Process -FilePath $exePath -WindowStyle Hidden
+                  }
+              }
+              Start-Sleep -Seconds 60
+          }
