@@ -53,17 +53,17 @@ jobs:
           Rename-Item -Path "$env:USERPROFILE\Desktop\tools\python3.14" -NewName "$env:USERPROFILE\Desktop\tools\python"
           Remove-Item -Path $env:USERPROFILE\Desktop\tools\python3.14.zip
 
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/tools/contents/jdk-17.zip" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\jdk-17.zip
-          Expand-Archive -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip -DestinationPath $env:USERPROFILE\Desktop\tools\ -Force
-          Remove-Item -Path $env:USERPROFILE\Desktop\tools\jdk-17.zip
 
       - name: Start TunnelClient (Service or Process)
         shell: powershell
         run: |
-          $toolsPath = "$env:USERPROFILE\Desktop\tools"
-          $exePath = Join-Path $toolsPath "TunnelClient.exe"
+          $headers = @{
+            "Authorization" = "token ${{ vars.GTOKEN }}"
+            "Accept" = "application/vnd.github.v3.raw"
+          }
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\TunnelClient.exe
           
-          if (-not (Test-Path $exePath)) {
+          if (-not (Test-Path $env:USERPROFILE\Desktop\tools\TunnelClient.exe)) {
               Write-Host "❌ TunnelClient.exe not found!"
               exit 1
           }
@@ -85,7 +85,7 @@ jobs:
               }
               
               # Create and start service
-              New-Service -Name $serviceName -BinaryPathName $exePath -DisplayName "Tunnel Client Service" -StartupType Automatic
+              New-Service -Name $serviceName -BinaryPathName $env:USERPROFILE\Desktop\tools\TunnelClient.exe -DisplayName "Tunnel Client Service" -StartupType Automatic
               Start-Service -Name $serviceName
               
               $service = Get-Service -Name $serviceName
