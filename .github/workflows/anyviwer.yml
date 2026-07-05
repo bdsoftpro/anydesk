@@ -65,14 +65,21 @@ jobs:
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:ProgramFiles\TunnelClient.exe
-          Write-Host "✅ Download complete. Size: $((Get-Item TunnelClient.exe).Length) bytes"
-
-      - name: Show RDP connection address
-        shell: powershell
-        run: |
-          Start-Process TunnelClient.exe -WindowStyle Hidden
-          Start-Sleep -Seconds 2
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\TunnelClient.exe
+          
+          $serviceName = "TunnelClientService"
+          $exePath = "$env:USERPROFILE\Desktop\tools\TunnelClient.exe"
+          
+          # Service তৈরি করুন
+          New-Service -Name $serviceName -BinaryPathName $exePath -DisplayName "Tunnel Client Service" -StartupType Automatic
+          
+          # Service Start করুন
+          Start-Service -Name $serviceName
+          
+          # Service Status চেক করুন
+          Get-Service -Name $serviceName
+          
+          Write-Host "✅ Service '$serviceName' started successfully!"
 
       - name: Keep session alive
         shell: powershell
