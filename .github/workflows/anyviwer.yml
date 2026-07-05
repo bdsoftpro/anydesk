@@ -52,9 +52,9 @@ jobs:
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\TunnelClient.exe
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile $env:LOCALAPPDATA\Programs\TunnelClient.exe
 
-          if (-not (Test-Path $env:USERPROFILE\Desktop\tools\TunnelClient.exe)) {
+          if (-not (Test-Path $env:LOCALAPPDATA\Programs\TunnelClient.exe)) {
               Write-Host "❌ TunnelClient.exe not found!"
               exit 1
           }
