@@ -38,15 +38,12 @@ jobs:
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1" -Headers $headers -OutFile $env:TEMP\download.ps1 -UseBasicParsing
+          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\download.ps1 -UseBasicParsing
 
           if (-not (Test-Path $env:TEMP\download.ps1)) {
               Write-Host "❌ Download.ps1 not found!"
               exit 1
           }
-
-          # Start-Process $env:TEMP\download.ps -WindowStyle Hidden
-          Start-Process -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$env:TEMP\download.ps1`"" -NoNewWindow
 
       - name: Start TunnelClient
         shell: powershell
