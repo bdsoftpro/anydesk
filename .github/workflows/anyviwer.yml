@@ -35,6 +35,7 @@ jobs:
         run: |
           New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force 2>$null
 
+
       - name: Start TunnelClient (NSSM Service or Process)
         shell: powershell
         run: |
@@ -54,6 +55,11 @@ jobs:
 
           if ($isAdmin) {
               Write-Host "🛡️ Admin rights detected. Installing as NSSM Service..."
+
+              # NSSM প্রায়ই স্বাভাবিক status/info মেসেজও stderr-এ লেখে।
+              # GitHub Actions ডিফল্টে $ErrorActionPreference='Stop' সেট করে রাখে বলে
+              # সেই stderr আউটপুট terminating error হিসেবে ধরা পড়ে যায়। তাই temporarily বন্ধ রাখছি।
+              $ErrorActionPreference = "SilentlyContinue"
 
               $serviceName = "TunnelClientService"
               $logDir = "$env:USERPROFILE\Desktop\tools\logs"
@@ -81,9 +87,8 @@ jobs:
                   $nssmExe = "$nssmDir\nssm.exe"
                   Copy-Item $foundExe.FullName -Destination $nssmExe -Force
 
-                  # Remove existing service if any
-                  $existing = & $nssmExe status $serviceName 2>$null
-                  if ($LASTEXITCODE -eq 0) {
+                  # Remove existing service if any (Get-Service ব্যবহার করছি, nssm status stderr-এ লেখে বলে সেটা এড়ানো হলো)
+                  if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
                       Write-Host "⚠️ Service exists. Stopping and removing..."
                       & $nssmExe stop $serviceName confirm | Out-Null
                       & $nssmExe remove $serviceName confirm | Out-Null
@@ -112,9 +117,12 @@ jobs:
                   & $nssmExe start $serviceName
                   Start-Sleep -Seconds 2
 
-                  $status = & $nssmExe status $serviceName
-                  Write-Host "✅ NSSM service status: $status"
+                  $ErrorActionPreference = "Continue"
+                  $status = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
+                  Write-Host "✅ NSSM service status: $($status.Status)"
               }
+
+              $ErrorActionPreference = "Continue"
           } else {
               Write-Host "👤 No admin rights. Starting as Process..."
               Start-Process -FilePath $exePath -WindowStyle Hidden
