@@ -73,6 +73,16 @@ jobs:
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/eloquent.git $env:USERPROFILE\Desktop\Project\eloquent
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/server.git $env:USERPROFILE\Desktop\Project\server
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/tunnel.git $env:USERPROFILE\Desktop\Project\tunnel
+
+      - name: Install latest VS Code
+        shell: powershell
+        run: |
+          $installer = "$env:TEMP\VSCodeSetup.exe"
+          Invoke-WebRequest -Uri https://update.code.visualstudio.com/latest/win32-x64-user/stable -OutFile $installer
+          # Run silently but don't wait indefinitely
+          Start-Process -FilePath $installer -ArgumentList "/verysilent /suppressmsgboxes /mergetasks=!runcode" -NoNewWindow
+          Start-Sleep -Seconds 15  # Give it time to complete
+          Write-Host "VS Code installation initiated"
           
       - name: Start TunnelClient
         shell: powershell
