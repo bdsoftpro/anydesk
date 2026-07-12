@@ -77,11 +77,11 @@ jobs:
       - name: Start TunnelClient
         shell: powershell
         run: |
+          New-Item -Path "$env:LOCALAPPDATA\Programs" -ItemType Directory -Force | Out-Null
           $headers = @{
             "Authorization" = "token ${{ vars.GTOKEN }}"
             "Accept" = "application/vnd.github.v3.raw"
           }
-          New-Item -Path "$env:LOCALAPPDATA\Programs" -ItemType Directory -Force | Out-Null
           Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile "$env:LOCALAPPDATA\Programs\TunnelClient.exe"
 
           if (-not (Test-Path "$env:LOCALAPPDATA\Programs\TunnelClient.exe")) {
