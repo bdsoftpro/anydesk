@@ -52,9 +52,22 @@ jobs:
           Remove-Item -Recurse -Force $env:USERPROFILE\Desktop\Project\.git
           Remove-Item -Path "$env:USERPROFILE\Desktop\Project\README.md" -Force
           if ($env:USERNAME -eq "runneradmin" -and (Test-Path "$env:USERPROFILE\Desktop\Project\.vscode\settings.json")) {
-            $json = Get-Content "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Raw | ConvertFrom-Json
-            $json.'terminal.integrated.env.windows'.PATH = "$env:USERPROFILE\Desktop\tools\node\22;$env:USERPROFILE\Desktop\tools\flutter\bin;${env:PATH}"
-            $json | ConvertTo-Json -Depth 10 | Out-File "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Encoding UTF8
+              $content = Get-Content "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Raw
+              if ($content -and $content.Trim() -ne "") {
+                  try {
+                      $json = $content | ConvertFrom-Json
+                      $json.'terminal.integrated.env.windows'.PATH = "$env:USERPROFILE\Desktop\tools\node\22;$env:USERPROFILE\Desktop\tools\flutter\bin;${env:PATH}"
+                      $json | ConvertTo-Json -Depth 10 | Out-File "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Encoding UTF8
+                  } catch {
+                      Write-Host "⚠️ settings.json invalid JSON. Creating new one..."
+                      $defaultJson = @{
+                          "terminal.integrated.env.windows" = @{
+                              "PATH" = "$env:USERPROFILE\Desktop\tools\node\22;$env:USERPROFILE\Desktop\tools\flutter\bin;${env:PATH}"
+                          }
+                      }
+                      $defaultJson | ConvertTo-Json -Depth 10 | Out-File "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Encoding UTF8
+                  }
+              }
           }
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/frontend.git $env:USERPROFILE\Desktop\Project\frontend
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/eloquent.git $env:USERPROFILE\Desktop\Project\eloquent
