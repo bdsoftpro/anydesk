@@ -49,8 +49,8 @@ jobs:
         shell: powershell
         run: |
           git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/stocky.git $env:USERPROFILE\Desktop\Project
-          rm -Recurse -Force $env:USERPROFILE\Desktop\Project\.git
-          rm -f $env:USERPROFILE\Desktop\Project\README.md
+          Remove-Item -Recurse -Force $env:USERPROFILE\Desktop\Project\.git
+          Remove-Item -Path "$env:USERPROFILE\Desktop\Project\README.md" -Force
           if ($env:USERNAME -eq "runneradmin" -and (Test-Path "$env:USERPROFILE\Desktop\Project\.vscode\settings.json")) {
             $json = Get-Content "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Raw | ConvertFrom-Json
             $json.'terminal.integrated.env.windows'.PATH = "$env:USERPROFILE\Desktop\tools\node\22;$env:USERPROFILE\Desktop\tools\flutter\bin;${env:PATH}"
