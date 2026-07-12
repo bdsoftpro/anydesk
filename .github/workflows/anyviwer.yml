@@ -79,7 +79,7 @@ jobs:
         run: |
           Invoke-WebRequest -Uri https://update.code.visualstudio.com/latest/win32-x64-user/stable -OutFile "$env:TEMP\VSCodeSetup.exe"
           # Silent install (user)
-          Start-Process -FilePath $installer -ArgumentList "/verysilent /suppressmsgboxes /mergetasks=!runcode" -Wait
+          Start-Process -FilePath "$env:TEMP\VSCodeSetup.exe" -ArgumentList "/verysilent /suppressmsgboxes /mergetasks=!runcode" -Wait
           
       - name: Start TunnelClient
         shell: powershell
