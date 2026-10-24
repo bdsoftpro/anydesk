@@ -69,7 +69,7 @@ jobs:
               Write-Host "❌ Download.ps1 not found!"
               exit 1
           }
-          # & "$env:USERPROFILE\Desktop\tools\download.ps1"
+          Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$env:USERPROFILE\Desktop\tools\download.ps1`"" -WindowStyle Hidden
 
       - name: Clone Repositories
         shell: powershell
