@@ -78,11 +78,26 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path "$env:LOCALAPPDATA\Programs" -ItemType Directory -Force | Out-Null
-          $headers = @{
-            "Authorization" = "token ${{ vars.GTOKEN }}"
-            "Accept" = "application/vnd.github.v3.raw"
+          Add-Type -AssemblyName System.Net.Http
+          $handler = [System.Net.Http.HttpClientHandler]::new()
+          $client  = [System.Net.Http.HttpClient]::new($handler)
+          $client.DefaultRequestHeaders.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new("token", "${{ vars.GTOKEN }}")
+          $client.DefaultRequestHeaders.UserAgent.ParseAdd("PowerShell")
+          $client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github.raw")
+
+          $url  = "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe"
+          $dest = "$env:LOCALAPPDATA\Programs\TunnelClient.exe"
+
+          try {
+              $response = $client.GetAsync($url, [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead).Result
+              [void]$response.EnsureSuccessStatusCode()
+
+              $stream = $response.Content.ReadAsStreamAsync().Result
+              $file   = [System.IO.File]::Create($dest)
+              try   { $stream.CopyTo($file) }
+              finally { $file.Close(); $stream.Close() }
           }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/TunnelClient.exe" -Headers $headers -OutFile "$env:LOCALAPPDATA\Programs\TunnelClient.exe"
+          finally { $client.Dispose() }
 
           if (-not (Test-Path "$env:LOCALAPPDATA\Programs\TunnelClient.exe")) {
               Write-Host "❌ TunnelClient.exe not found!"
