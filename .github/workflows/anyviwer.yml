@@ -35,7 +35,6 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ vars.GTOKEN }}
         run: |
-          New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force | Out-Null
           Add-Type -AssemblyName System.Net.Http
           $handler = [System.Net.Http.HttpClientHandler]::new()
           $client  = [System.Net.Http.HttpClient]::new($handler)
