@@ -36,6 +36,7 @@ jobs:
             GITHUB_TOKEN: ${{ vars.GTOKEN }}
         run: |
           Add-Type -AssemblyName System.Net.Http
+          [System.IO.Directory]::CreateDirectory("$env:USERPROFILE\Desktop\tools") | Out-Null
           $handler = [System.Net.Http.HttpClientHandler]::new()
           $client  = [System.Net.Http.HttpClient]::new($handler)
           $client.DefaultRequestHeaders.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new("token", "${{ vars.GTOKEN }}")
