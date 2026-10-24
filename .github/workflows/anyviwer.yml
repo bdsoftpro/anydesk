@@ -34,16 +34,14 @@ jobs:
         shell: powershell
         run: |
           New-Item -Path $env:USERPROFILE\Desktop\tools -ItemType Directory -Force | Out-Null
-          $headers = @{
-            "Authorization" = "token ${{ vars.GTOKEN }}"
-            "Accept" = "application/vnd.github.v3.raw"
-          }
-          Invoke-WebRequest -Uri "https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1" -Headers $headers -OutFile $env:USERPROFILE\Desktop\tools\download.ps1 -UseBasicParsing
-
+          env:
+            GITHUB_TOKEN: ${{ vars.GTOKEN }}
+          Start-BitsTransfer -Source https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1 -Destination $env:USERPROFILE\Desktop\tools\download.ps1
           if (-not (Test-Path $env:USERPROFILE\Desktop\tools\download.ps1)) {
               Write-Host "❌ Download.ps1 not found!"
               exit 1
           }
+          ./download.ps1
 
       - name: Clone Repositories
         shell: powershell
