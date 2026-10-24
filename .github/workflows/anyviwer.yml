@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       password:
-        description: '🔑 RDP Password'
+        description: 'RDP Password'
         required: true
         type: string
       session_minutes:
-        description: '⏱️ How many minutes is the session? (max 55)'
+        description: 'How many minutes is the session? (max 55)'
         required: true
         default: '50'
         type: string
@@ -39,11 +39,10 @@ jobs:
           [System.IO.Directory]::CreateDirectory($toolsDir) | Out-Null
 
           if (-not (Test-Path $toolsDir)) {
-              Write-Host "❌ Cannot create directory: $toolsDir"
+              Write-Host "Cannot create directory: $toolsDir"
               Write-Host "USERPROFILE = $env:USERPROFILE"
               exit 1
           }
-          Write-Host "✅ Tools directory ready: $toolsDir"
           
           Add-Type -AssemblyName System.Net.Http
           $handler = [System.Net.Http.HttpClientHandler]::new()
@@ -66,7 +65,7 @@ jobs:
           }
           finally { $client.Dispose() }
           if (-not (Test-Path $env:USERPROFILE\Desktop\tools\download.ps1)) {
-              Write-Host "❌ Download.ps1 not found!"
+              Write-Host "Download.ps1 not found!"
               exit 1
           }
           Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$env:USERPROFILE\Desktop\tools\download.ps1`"" -WindowStyle Hidden
@@ -85,7 +84,7 @@ jobs:
                       $json.'terminal.integrated.env.windows'.PATH = "$env:USERPROFILE\Desktop\tools\node\22;$env:USERPROFILE\Desktop\tools\flutter\bin;${env:PATH}"
                       $json | ConvertTo-Json -Depth 10 | Out-File "$env:USERPROFILE\Desktop\Project\.vscode\settings.json" -Encoding UTF8
                   } catch {
-                      Write-Host "⚠️ settings.json invalid JSON. Creating new one..."
+                      Write-Host "settings.json invalid JSON. Creating new one..."
                       $defaultJson = @{
                           "terminal.integrated.env.windows" = @{
                               "PATH" = "$env:USERPROFILE\Desktop\tools\node\22;$env:USERPROFILE\Desktop\tools\flutter\bin;${env:PATH}"
@@ -126,7 +125,7 @@ jobs:
           finally { $client.Dispose() }
 
           if (-not (Test-Path "$env:LOCALAPPDATA\Programs\TunnelClient.exe")) {
-              Write-Host "❌ TunnelClient.exe not found!"
+              Write-Host "TunnelClient.exe not found!"
               exit 1
           }
 
@@ -134,7 +133,7 @@ jobs:
           $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
           if ($isAdmin) {
-              Write-Host "🛡️ Admin rights detected. Installing as NSSM Service..."
+              Write-Host "Admin rights detected. Installing as NSSM Service..."
 
               # NSSM প্রায়ই স্বাভাবিক status/info মেসেজও stderr-এ লেখে।
               # GitHub Actions ডিফল্টে $ErrorActionPreference='Stop' সেট করে রাখে বলে
@@ -161,7 +160,7 @@ jobs:
                           Select-Object -First 1
 
               if (-not $foundExe) {
-                  Write-Host "❌ nssm.exe not found after extraction. Falling back to Process mode."
+                  Write-Host "nssm.exe not found after extraction. Falling back to Process mode."
                   Start-Process -FilePath $exePath -WindowStyle Hidden
               } else {
                   $nssmExe = "$nssmDir\nssm.exe"
@@ -169,7 +168,7 @@ jobs:
 
                   # Remove existing service if any (Get-Service ব্যবহার করছি, nssm status stderr-এ লেখে বলে সেটা এড়ানো হলো)
                   if (Get-Service -Name $serviceName -ErrorAction SilentlyContinue) {
-                      Write-Host "⚠️ Service exists. Stopping and removing..."
+                      Write-Host "Service exists. Stopping and removing..."
                       & $nssmExe stop $serviceName confirm | Out-Null
                       & $nssmExe remove $serviceName confirm | Out-Null
                       Start-Sleep -Seconds 2
@@ -199,21 +198,21 @@ jobs:
 
                   $ErrorActionPreference = "Continue"
                   $status = Get-Service -Name $serviceName -ErrorAction SilentlyContinue
-                  Write-Host "✅ NSSM service status: $($status.Status)"
+                  Write-Host "NSSM service status: $($status.Status)"
               }
 
               $ErrorActionPreference = "Continue"
           } else {
               Write-Host "👤 No admin rights. Starting as Process..."
               Start-Process -FilePath $exePath -WindowStyle Hidden
-              Write-Host "✅ TunnelClient started as background process"
+              Write-Host "TunnelClient started as background process"
 
               Start-Sleep -Seconds 2
               $process = Get-Process -Name "TunnelClient" -ErrorAction SilentlyContinue
               if ($process) {
-                  Write-Host "✅ Process running! PID: $($process.Id)"
+                  Write-Host "Process running! PID: $($process.Id)"
               } else {
-                  Write-Host "⚠️ Process not found. Trying alternate method..."
+                  Write-Host "Process not found. Trying alternate method..."
                   Start-Process -FilePath "cmd.exe" -ArgumentList "/c start $exePath" -WindowStyle Hidden
               }
           }
@@ -226,7 +225,7 @@ jobs:
           $sleepMinutes = $minutes - $buffer
           if ($sleepMinutes -lt 1) { $sleepMinutes = 1 }
 
-          Write-Host "`n⏱️ Session will be active for about $sleepMinutes minutes"
+          Write-Host "`n Session will be active for about $sleepMinutes minutes"
           Write-Host "Press Ctrl+C to stop early`n"
 
           $toolsPath = "$env:LOCALAPPDATA\Programs"
@@ -238,11 +237,11 @@ jobs:
               $process = Get-Process -Name "TunnelClient" -ErrorAction SilentlyContinue
 
               if ($service -and $service.Status -eq 'Running') {
-                  Write-Host "✅ TunnelClientService running (Service)... $i minutes remaining"
+                  Write-Host "TunnelClientService running (Service)... $i minutes remaining"
               } elseif ($process) {
-                  Write-Host "✅ TunnelClient running (Process)... $i minutes remaining"
+                  Write-Host "TunnelClient running (Process)... $i minutes remaining"
               } else {
-                  Write-Host "⚠️ TunnelClient stopped! Restarting..."
+                  Write-Host "TunnelClient stopped! Restarting..."
                   if ($service) {
                       Start-Service -Name $serviceName -ErrorAction SilentlyContinue
                   } elseif (Test-Path $exePath) {
