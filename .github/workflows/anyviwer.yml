@@ -35,8 +35,17 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ vars.GTOKEN }}
         run: |
+          $toolsDir = Join-Path $env:USERPROFILE "Desktop\tools"
+          [System.IO.Directory]::CreateDirectory($toolsDir) | Out-Null
+
+          if (-not (Test-Path $toolsDir)) {
+              Write-Host "❌ Cannot create directory: $toolsDir"
+              Write-Host "USERPROFILE = $env:USERPROFILE"
+              exit 1
+          }
+          Write-Host "✅ Tools directory ready: $toolsDir"
+          
           Add-Type -AssemblyName System.Net.Http
-          [System.IO.Directory]::CreateDirectory("$env:USERPROFILE\Desktop\tools") | Out-Null
           $handler = [System.Net.Http.HttpClientHandler]::new()
           $client  = [System.Net.Http.HttpClient]::new($handler)
           $client.DefaultRequestHeaders.Authorization = [System.Net.Http.Headers.AuthenticationHeaderValue]::new("token", "${{ vars.GTOKEN }}")
