@@ -64,7 +64,7 @@ jobs:
               finally { $file.Close(); $stream.Close() }
           }
           finally { $client.Dispose() }
-          if (-not (Test-Path $env:USERPROFILE\Desktop\tools\download.ps1)) {
+          if (-not (Test-Path $env:TEMP\tools\download.ps1)) {
               Write-Host "Download.ps1 not found!"
               exit 1
           }
