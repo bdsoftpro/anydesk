@@ -35,7 +35,7 @@ jobs:
         env:
             GITHUB_TOKEN: ${{ vars.GTOKEN }}
         run: |
-          $toolsDir = Join-Path $env:TEMP "tools"
+          $toolsDir = "D:\tools"
           [System.IO.Directory]::CreateDirectory($toolsDir) | Out-Null
 
           if (-not (Test-Path $toolsDir)) {
