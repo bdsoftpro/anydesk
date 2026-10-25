@@ -40,7 +40,6 @@ jobs:
 
           if (-not (Test-Path $toolsDir)) {
               Write-Host "Cannot create directory: $toolsDir"
-              Write-Host "USERPROFILE = $env:USERPROFILE"
               exit 1
           }
           
@@ -52,7 +51,7 @@ jobs:
           $client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github.raw")
 
           $url  = "https://api.github.com/repos/bdsoftpro/apk/contents/download.ps1"
-          $dest = "$env:TEMP\tools\download.ps1"
+          $dest = "$toolsDir\download.ps1"
 
           try {
               $response = $client.GetAsync($url, [System.Net.Http.HttpCompletionOption]::ResponseHeadersRead).Result
@@ -64,11 +63,11 @@ jobs:
               finally { $file.Close(); $stream.Close() }
           }
           finally { $client.Dispose() }
-          if (-not (Test-Path $env:TEMP\tools\download.ps1)) {
+          if (-not (Test-Path $toolsDir\download.ps1)) {
               Write-Host "Download.ps1 not found!"
               exit 1
           }
-          Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$env:TEMP\tools\download.ps1`"" -WindowStyle Hidden
+          Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$toolsDir\download.ps1`"" -WindowStyle Hidden
 
       - name: Clone Repositories
         shell: powershell
