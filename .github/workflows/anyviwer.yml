@@ -72,7 +72,7 @@ jobs:
       - name: Clone Repositories
         shell: powershell
         run: |
-          git clone https://${{ vars.GTOKEN }}@https://github.com/bdsoftpro/khoj.git D:\Project
+          git clone https://${{ vars.GTOKEN }}@github.com/bdsoftpro/khoj.git D:\Project
           
       - name: Start TunnelClient
         shell: powershell
