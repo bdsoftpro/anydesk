@@ -67,8 +67,7 @@ jobs:
               Write-Host "Download.ps1 not found!"
               exit 1
           }
-          # Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$toolsDir\download.ps1`"" -WindowStyle Hidden
-          . "$toolsDir\download.ps1"
+          Start-Process -FilePath "powershell.exe" -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$toolsDir\download.ps1`"" -WindowStyle Hidden
 
       - name: Clone Repositories
         shell: powershell
